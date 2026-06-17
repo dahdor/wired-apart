@@ -1,0 +1,57 @@
+# _quarto.yml — Configuración del proyecto Quarto para el informe técnico.
+# Documentación: https://quarto.org/docs/projects/
+
+project:
+  type: default
+  title: "Wired Apart"
+
+# Bibliografía (BibTeX exportado a partir del .bib del libro)
+bibliography: references/references.bib
+csl: references/apa.csl
+
+# Formatos de salida
+format:
+  html:
+    theme:
+      light: cosmo
+    toc: true
+    toc-depth: 3
+    toc-location: right
+    number-sections: true
+    code-fold: true
+    code-tools: true
+    fig-width: 8
+    fig-height: 5
+    fig-dpi: 200
+    embed-resources: true
+  pdf:
+    documentclass: scrartcl
+    papersize: letter
+    toc: true
+    number-sections: true
+    fig-width: 7
+    fig-height: 4.5
+    fig-dpi: 200
+    include-in-header:
+      text: |
+        \usepackage{fancyhdr}
+        \pagestyle{fancy}
+        \fancyhead[L]{\small Wired Apart}
+        \fancyhead[R]{\small Diego Hernández — FPTSP27}
+        \fancyfoot[C]{\thepage}
+
+# Ejecución: ocultamos el código en el HTML por defecto (se puede expandir con los code-tools)
+execute:
+  echo: false
+  warning: false
+  cache: true
+  freeze: auto
+
+# Freezar la ejecución de los chunks (Quarto solo rerendera si cambió el .qmd)
+
+# Directorio de salida
+output-dir: reports
+
+# Recursos (figuras auxiliares, logo)
+resources:
+  - logo-unimet.png

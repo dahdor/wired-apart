@@ -1,0 +1,89 @@
+---
+title: "Wired Apart"
+subtitle: "Cuantificando el coste de la childhood digital sobre el bienestar adolescente (EE.UU., 2005–2020)"
+author: "Diego Hernández"
+date: today
+abstract: |
+  *Borrador — este es el archivo de Quarto que se va a llenar en la Fase 9 del proyecto.
+  La estructura se bosqueja para que el lector entienda la forma final del informe.
+  El contenido analítico real se escribe después de ejecutar el pipeline.*
+keywords: [adolescent mental health, smartphone, social media, MTF, NSDUH, data storytelling]
+title-block-banner: true
+include-before-body:
+  text: |
+    ![Logo Universidad Metropolitana](logo-unimet.png){width=1.5in}
+lang: es
+---
+
+# Resumen
+
+> _A redactar en Fase 9._
+
+**Pregunta de investigación.** ¿En qué magnitud y con qué rapidez la transición a una "infancia basada en el teléfono" (2010–2015) se asocia con el deterioro de indicadores de bienestar adolescente en EE.UU., y qué marco de monitoreo e intervención digital permite medir y revertir ese efecto en entornos escolares?
+
+**Método.** Pipeline reproducible sobre dos datasets públicos (MTF y NSDUH) con orden metodológico explícito en limpieza, análisis de correlación segmentado por género/cohorte/período, y verificación de la paradoja de Simpson.
+
+**Hallazgos principales.** _A completar en Fase 6._
+
+**Propuesta.** Framework de monitoreo *Phone-Free Schools* con métricas de proceso y resultado, basado en la evidencia cuantitativa de las fases previas.
+
+# 1. Introducción
+
+## 1.1 Contexto
+
+_The Anxious Generation_ (Haidt, 2024) argumenta que entre 2010 y 2015 ocurrió una "Gran Reconexión" de la infancia: la infancia *play-based* fue reemplazada por una infancia *phone-based*. La consecuencia fue un aumento súbito y global de los trastornos internalizantes (ansiedad, depresión, autolesión) entre adolescentes, especialmente niñas preadolescentes.
+
+Este informe **cuantifica** ese argumento con datos públicos y propone una solución de ingeniería.
+
+## 1.2 Pregunta de investigación (SMART)
+
+| | |
+|---|---|
+| **Específica** | Asociación entre adopción de smartphone (2010-2015) y deterioro de indicadores de bienestar adolescente (satisfacción, soledad, sueño, diagnóstico depresivo) en EE.UU. |
+| **Medible** | Coeficientes de correlación (Pearson/Spearman) por género, cohorte y período; pruebas de hipótesis con α = 0.05. |
+| **Alcanzable** | Integración de MTF + NSDUH, 2005-2020, n ≈ 85 000/año. |
+| **Relevante** | Habilita una propuesta concreta de monitoreo para entornos escolares. |
+| **Temporal** | Ventana 2005-2020 (5 años pre y 5 años post Great Rewiring). |
+
+## 1.3 Estructura del informe
+
+Secciones 2-9: [@sec-datos; @sec-calidad; @sec-eda; @sec-analisis; @sec-discusion; @sec-solucion; @sec-conclusiones].
+
+# 2. Datos y fuentes {#sec-datos}
+
+> _A redactar en Fase 9 con la tabla de datasets, hashes, fechas de descarga y enlaces a las data dictionaries en `references/`._
+
+# 3. Calidad de los datos {#sec-calidad}
+
+> _A redactar en Fase 3-4 con el diagnóstico → decisión → verificación por dataset._
+
+# 4. Análisis exploratorio (EDA) {#sec-eda}
+
+> _A redactar en Fase 4 con las visualizaciones narradas._
+
+# 5. Análisis principal {#sec-analisis}
+
+> _A redactar en Fase 5 con los resultados de correlación, segmentación y paradoja de Simpson._
+
+# 6. Discusión {#sec-discusion}
+
+> _A redactar en Fase 6 con la comparación contra la literatura del libro._
+
+# 7. Solución de ingeniería {#sec-solucion}
+
+> _A redactar en Fase 7 con el framework Phone-Free Schools._
+
+# 8. Conclusiones y limitaciones {#sec-conclusiones}
+
+> _A redactar en Fase 9._
+
+# Referencias
+
+::: {#refs}
+:::
+
+# Apéndices
+
+- **Apéndice A.** Data dictionaries completas en `references/`.
+- **Apéndice B.** Notebooks del pipeline (rutas absolutas en `notebooks/`).
+- **Apéndice C.** Figuras adicionales y análisis de sensibilidad.

@@ -1,0 +1,43 @@
+<!-- APA 7th edition CSL (Citation Style Language) -->
+<style xmlns="http://puri.org/xstyl/" version="1.0" class="in-text">
+  <!--
+    APA 7th edition
+    Source: https://raw.githubusercontent.com/citation-style-language/styles/master/apa.csl
+    For brevity this is a minimal placeholder; download the official file from the CSL repository
+    and place it here: https://github.com/citation-style-language/styles/raw/master/apa.csl
+  -->
+  <info>
+    <title>American Psychological Association 7th edition (placeholder)</title>
+    <id>http://www.zotero.org/styles/apa</id>
+    <link href="http://www.zotero.org/styles/apa" rel="self"/>
+  </info>
+  <macro name="author">
+    <names variable="author" suffix="."/>
+  </macro>
+  <macro name="issued">
+    <date variable="issued">
+      <date-part name="year"/>
+    </date>
+  </macro>
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true">
+    <sort>
+      <key macro="author"/>
+      <key macro="issued"/>
+    </sort>
+    <layout delimiter="; " prefix="(" suffix=")">
+      <text macro="author" suffix=", "/>
+      <text macro="issued"/>
+    </layout>
+  </citation>
+  <bibliography hanging-indent="true" et-al-min="21" et-al-use-first="20">
+    <sort>
+      <key macro="author"/>
+      <key macro="issued"/>
+    </sort>
+    <layout suffix=".">
+      <text macro="author" suffix=" ("/>
+      <text macro="issued" suffix="). "/>
+      <text variable="title"/>
+    </layout>
+  </bibliography>
+</style>
