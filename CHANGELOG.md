@@ -113,6 +113,46 @@ reproducibilidad** que se corrigieron.
 
 ---
 
+## [Sin versión] — 2026-06-18 — Legibilidad del heatmap Simpson (fig11)
+
+- **Hallazgo:** `fig11_simpson_heatmap.png` mostraba las anotaciones
+  dentro de cada celda a ~16-18pt (en lugar de los 8pt pedidos vía
+  `annot_kws={"fontsize": 8}`), porque `apply_project_style()` fija
+  `context="talk"` (font.size = 18) y seaborn **ignora** el
+  `annot_kws["fontsize"]` cuando el rcParam global es mayor. Resultado:
+  los strings `+13.0 [-3.6,+26.9]*` desbordaban las celdas y el
+  asterisco de "n_pre<200" era casi invisible.
+- **Corrección aplicada:**
+  1. Extraer la lógica del heatmap a `wired_apart.plots.simpson_heatmap()`,
+     que fuerza un contexto "notebook" temporal (con save/restore de
+     `rcParams`) solo para esa figura. Las demás figuras del proyecto
+     siguen usando `context="talk"`.
+  2. Anotaciones en **dos líneas** (`+13.0*\n[-3.6,+26.9]`) en vez de
+     una, para que cada renglón quepa en la celda.
+  3. Título jerarquizado (3 líneas: principal + eje + convención de
+     asterisco) y etiqueta de colorbar compacta ("Δ sad/hopeless (pp)").
+  4. `subplots_adjust` con márgenes explícitos (top=0.82, left=0.18,
+     right=0.92) en lugar de `tight_layout()`, que recortaba el renglón
+     superior del título.
+- **Rigor metodológico preservado:** siguen apareciendo el delta
+  ponderado, el IC95 bootstrap, y el flag `*` para `n_pre<200`. La
+  función falla con `ValueError` explícito si `simp_df` no tiene las
+  columnas requeridas o está vacío.
+- **Testabilidad:** 6 tests nuevos en `tests/test_plots.py` que
+  reproducen exactamente el bug original (`test_simpson_heatmap_uses_paper_context`
+  asserta que el fontsize de los Text ≤ 12pt, lo que fallaría si
+  reaparece el bug). Total: 38 tests, todos verdes.
+- **Archivos modificados:**
+  - `wired_apart/plots.py` (+127 líneas: `_paper_context`, `_format_cell`,
+    `simpson_heatmap`)
+  - `tests/test_plots.py` (+85 líneas: 6 tests nuevos)
+  - `notebooks/3.0-dh-analysis.ipynb` (celda del heatmap ahora delega
+    en la función, en vez de 25 líneas de código inline frágil)
+  - `reports/figures/fig11_simpson_heatmap.png` regenerado
+    (3390×1698 → 2236×1700, ≈ 33% menos pixeles; 232 KB)
+
+---
+
 ## [Sin versión] — 2026-06-18 — Auditoría externa (segunda iteración) y correcciones de los 4 hallazgos críticos
 
 Auditoría de seguimiento. Se identificaron **4 hallazgos críticos adicionales** derivados de un examen metodológico más profundo del notebook 3.0 (análisis principal) y del notebook 1.0 (cleaning). Los 4 hallazgos afectaban:
