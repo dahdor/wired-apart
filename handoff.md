@@ -135,16 +135,16 @@
 - `references/wonder_data_dictionary.md` — escrito a mano
 - `references/references.bib` — BibTeX con Haidt 2024, Twenge 2017, Dawson 2020, CDC, SAMHSA, MTF
 
-## 7. Estilo de evaluación de Carolina (lo que ella mira)
+## 7. Estilo metodológico asumido (orden diagnóstico → decisión → verificación)
 
-Crucé `p1/correcciones.md` y `prac1/correcciones.md`. Patrones que importan:
+Patrones que importan para un informe cuantitativo serio:
 
 - **Orden metodológico estricto:** tipos → categorías → valores imposibles → *después* imputar.
 - **Cero "obviedades":** cada conversión, winsorización, descarte de duplicado tiene justificación + verificación post-acción.
 - **SMART con metas cuantitativas:** no "analizar el uso" sino "aumentar 10-15%".
 - **Storytelling > análisis técnico:** 7 plantillas de Dawson C9 obligatorias.
 - **Estructura diagnóstico → decisión → verificación** en cada bloque.
-- **Frases recurrentes:** "buen trabajo / buen pensamiento" + "pero hay que cuidar los detalles".
+- **Frases recurrentes en feedback docente:** "buen trabajo / buen pensamiento" + "pero hay que cuidar los detalles".
 
 **Implicación cumplida:** los notebooks 1.0 y 1.1 tienen celdas markdown explícitas de **diagnóstico → decisión → verificación** en cada paso. EDA 2.0 usa 5 de las 7 plantillas de Dawson.
 
@@ -235,18 +235,17 @@ Crucé `p1/correcciones.md` y `prac1/correcciones.md`. Patrones que importan:
 
 ## 11.1 Tareas restantes (post-entrega)
 
-Diego dijo "Carolina no hará correcciones del proyecto antes de entregar: debes hacer las revisiones tú. Así que crea el repositorio, actualiza el handoff y procederé a comprimir la conversación para hacer la revisión de todo." (junio 2026).
+Diego dijo que no habrá correcciones del proyecto antes de entregar; las revisiones las hago yo. Así que crea el repositorio, actualiza el handoff y procede a comprimir la conversación para hacer la revisión de todo (junio 2026).
 
 **Checklist de auto-revisión para Diego al descomprimir:**
 
 1. [ ] Releer este handoff (5 min) para refrescar el contexto.
 2. [ ] Verificar que la URL del repo esté accesible: `https://github.com/dahdor/wired-apart`.
 3. [ ] Abrir `reports/informe.html` o `reports/informe.pdf` y leer el informe completo (24 páginas).
-4. [ ] Releer `p1/correcciones.md` y `prac1/correcciones.md` para recordar el estilo de Carolina.
-5. [ ] Re-ejecutar el pipeline (`make data clean eda analyze` o uv run equivalents) para confirmar reproducibilidad.
-6. [ ] Decidir si el bug de la columna `race` (Sección 9.4) se corrige o se documenta como limitación.
-7. [ ] Verificar que las 14 figuras se ven correctamente en el informe.
-8. [ ] Verificar que el README y la descripción del repo en GitHub están sincronizados.
+4. [ ] Re-ejecutar el pipeline (`make data clean eda analyze` o uv run equivalents) para confirmar reproducibilidad.
+5. [ ] Decidir si el bug de la columna `race` (Sección 9.4) se corrige o se documenta como limitación.
+6. [ ] Verificar que las 14 figuras se ven correctamente en el informe.
+7. [ ] Verificar que el README y la descripción del repo en GitHub están sincronizados.
 
 ## 12. Cómo retomar el trabajo
 
@@ -269,7 +268,7 @@ git add -A && git commit -m "..." && git push
 
 - Plan completo: `.agents/plans/plan-proyecto-ad.md`
 - Enunciado del proyecto: `enunciado-proyecto.md` (raíz del workspace `ad/`)
-- Correcciones de Carolina: `p1/correcciones.md` y `prac1/correcciones.md` (raíz)
+- Material de referencia del curso: `content/dawson/`, `content/lessons/`, `content/the-anxious-generation/` (raíz)
 - Dawson C9 (storytelling): `content/dawson/Dawson C9 - Data Storytelling and Visualization copy.md`
 - Clase 7 (visualización y storytelling): `content/lessons/Clase 7 - Visualización y Storytelling.md`
 - The Anxious Generation: `content/the-anxious-generation/` (12 capítulos + conclusión + intro)

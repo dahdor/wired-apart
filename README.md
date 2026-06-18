@@ -308,13 +308,15 @@ Outputs:
 
 ## Documentación adicional
 
-- **Plan completo del proyecto:** `.agents/plans/plan-proyecto-ad.md` (workspace parent).
+Todo lo que se necesita para entender el proyecto está en este repositorio.
+
 - **Notas vivas (handoff):** `handoff.md` en este directorio. Contiene contexto, decisiones, quirks de herramientas, y lista de bugs corregidos en la revisión de jun-2026.
 - **Data dictionaries:**
   - `references/yrbs_data_dictionary.md` — Q-codes, crosswalk, Q80 solo 2019, race=CDC `raceeth`.
   - `references/wonder_data_dictionary.md` — ICD-10 X60-X84, HUS 2018 Table 9.
   - `references/data_provenance.md` — hashes SHA-256, URLs, cobertura.
 - **Bibliografía:** `references/references.bib` (BibTeX con Haidt 2024, Twenge 2017, Dawson 2020, CDC, NCHS, Lee 2022).
+- **Estilo CSL:** `references/apa.csl` (Citation Style Language APA 7).
 
 ---
 

@@ -4,27 +4,31 @@ subtitle: "Cuantificando el coste de la childhood digital sobre el bienestar ado
 author: "Diego Hernández"
 date: today
 abstract: |
-  Este informe replica y extiende los hallazgos de *The Anxious Generation* (Haidt, 2024) sobre
+  Este informe replica y extiende los hallazgos de *The Anxious Generation* [-@haidt2024anxious] sobre
   el deterioro del bienestar adolescente tras la "Gran Reconexión" digital (2010-2015). Usando
   dos datasets públicos estadounidenses — *Youth Risk Behavior Survey* (YRBS, 9 olas bianuales
-  2005-2021, n = 134 674) y mortalidad adolescente por suicidio (NCHS Socrata + Health,
-  United States 2018 Table 9) — demostramos que el porcentaje de estudiantes que reportan
-  haberse sentido "tristes o desesperanzados" 2+ semanas seguidas subió de 28.5% (2005) a
-  42.3% (2021), con un aumento desproporcionado en mujeres (36.7% → 56.6%, +54%). La
-  regresión logística con pesos muestrales (n = 131 936) muestra un OR de 1.93 (IC95
-  1.84-2.03) para 2021 vs 2005, controlando por sexo y edad. En 2019, los estudiantes que
-  reportan 5+ horas diarias de pantalla (incluyendo social media) tienen 2.14x el odds de
-  depresión (IC95 1.90-2.41) vs los que no usan pantalla. La mortalidad completed por
-  suicidio adolescente en 15-19 años cambió de régimen en 2010-2018: de 7.5/100k a
-  12.0/100k (+60%). La mortalidad no captura la carga de salud mental, especialmente en
-  mujeres. Proponemos un framework operacional *Phone-Free Schools* con 4 palancas y 5 KPIs
-  SMART, evaluable mediante un RCT cluster-aleatorizado (n = 3 000, 2 años, USD 210/est/año).
+  2005-2021, n = 134 674; @cdcyrbs2023) y mortalidad adolescente por suicidio (NCHS Socrata +
+  Health, United States 2018 Table 9; @nchshus2018) — demostramos que el porcentaje de
+  estudiantes que reportan haberse sentido "tristes o desesperanzados" 2+ semanas seguidas
+  subió de 28.5% (2005) a 42.3% (2021), con un aumento desproporcionado en mujeres
+  (36.7% → 56.6%, +54%). La regresión logística con pesos muestrales (n = 131 936) muestra
+  un OR de 1.93 (IC95 1.84-2.03) para 2021 vs 2005, controlando por sexo y edad. En 2019, los
+  estudiantes que reportan 5+ horas diarias de pantalla (incluyendo social media) tienen 2.14x
+  el odds de depresión (IC95 1.90-2.41) vs los que no usan pantalla. La mortalidad completed
+  por suicidio adolescente en 15-19 años cambió de régimen en 2010-2018: de 7.5/100k a
+  12.0/100k (+60%) [@nchsdb471]. La mortalidad no captura la carga de salud mental,
+  especialmente en mujeres. Proponemos un framework operacional *Phone-Free Schools* con
+  4 palancas y 5 KPIs SMART, evaluable mediante un RCT cluster-aleatorizado
+  (n = 3 000, 2 años, USD 210/est/año).
+
+  **Repositorio y reproducibilidad:** el código completo, los datos limpios y los
+  notebooks están disponibles en <https://github.com/dahdor/wired-apart>.
 keywords: [adolescent mental health, smartphone, social media, YRBS, NCHS, data storytelling,
            Phone-Free Schools, Cochran-Armitage, regression, public health]
 title-block-banner: true
 include-before-body:
   text: |
-    ![Logo Universidad Metropolitana](logo-unimet.png){width=1.5in}
+    <p align="center"><img src="logo-unimet.png" width="200"/></p>
 lang: es
 ---
 
@@ -123,7 +127,7 @@ Todos los datasets y outputs tienen hash SHA-256 en `references/data_provenance.
 
 # 3. Calidad de los datos {#sec-calidad}
 
-Se aplicó la metodología **diagnóstico → decisión → verificación** (orden Carolina Bockmeulen) en cada paso. Detalles completos en notebooks 1.0 y 1.1.
+Se aplicó la metodología **diagnóstico → decisión → verificación** (orden metodológico estándar: tipos → categorías → imposibles → faltantes) en cada paso. Detalles completos en notebooks 1.0 y 1.1.
 
 ## 3.1 YRBS — pasos de limpieza
 
@@ -341,7 +345,7 @@ El **punto de inflexión 2010-2015** coincide con la ventana del Great Rewiring.
 Nuestros hallazgos son consistentes con:
 
 - **Haidt (2024):** aumento post-2012 más marcado en mujeres, gap de género amplificándose, screen time como mediador clave.
-- **Twenge (2017):** iGen mostrando más soledad, menos interacción cara a cara.
+- **Twenge (2017) [-@twenge2017igen]:** iGen mostrando más soledad, menos interacción cara a cara.
 - **CDC (2023, NCHS Data Brief 471):** mortalidad 15-19 con pico en 2018.
 - **Mercado et al. (2022), Lancet Child & Adolescent Health:** association 5+ h/día con depresión.
 
@@ -379,7 +383,7 @@ Nuestros hallazgos son consistentes con:
 
 Inversión: $210/est/año × 1 000 estudiantes × 4 años = **$840k por escuela**.
 
-ROI estimado: 3-5x en costos evitados de salud mental (Lee et al. 2022, Lancet Child & Adolescent Health).
+ROI estimado: 3-5x en costos evitados de salud mental [-@lee2022roi].
 
 # 8. Conclusiones y limitaciones {#sec-conclusiones}
 
@@ -488,6 +492,8 @@ Python 3.12, pandas, numpy, matplotlib, seaborn, scipy, statsmodels, pyodbc, pya
 
 ::: {#refs}
 :::
+
+Las referencias se generan automáticamente desde `references/references.bib` para todas las citas insertadas con `[@key]` o `[-@key]` en el texto.
 
 # Apéndices
 

@@ -12,8 +12,10 @@ csl: references/apa.csl
 # Formatos de salida
 format:
   html:
-    theme:
-      light: cosmo
+    # theme: default — usa las fuentes serif de Bootstrap (consistente
+    # en títulos y cuerpo). Diego prefiere la fuente default antes que
+    # cosmo (que mezcla sans-serif en títulos con serif en cuerpo).
+    theme: default
     toc: true
     toc-depth: 3
     toc-location: right
@@ -28,17 +30,28 @@ format:
     documentclass: scrartcl
     papersize: letter
     toc: true
+    # El TOC va en su propia página, antes y después del contenido
+    toc-title-page: true
+    # Forzar salto de página después del TOC
+    include-after-body:
+      text: |
+        \clearpage
     number-sections: true
     fig-width: 7
     fig-height: 4.5
     fig-dpi: 200
+    # mainfont = lmodern por default; con scrartcl ya es serif coherente
     include-in-header:
       text: |
         \usepackage{fancyhdr}
         \pagestyle{fancy}
         \fancyhead[L]{\small Wired Apart}
-        \fancyhead[R]{\small Diego Hernández — FPTSP27}
+        \fancyhead[R]{\small Diego Hernández}
         \fancyfoot[C]{\thepage}
+        % Forzar página propia para el TOC: salto antes del abstract
+        \usepackage{etoolbox}
+        \AtBeginDocument{\let\origmaketitle\maketitle
+          \renewcommand{\maketitle}{\origmaketitle\clearpage}}
 
 # Ejecución: ocultamos el código en el HTML por defecto (se puede expandir con los code-tools)
 execute:
@@ -47,11 +60,11 @@ execute:
   cache: true
   freeze: auto
 
-# Freezar la ejecución de los chunks (Quarto solo rerendera si cambió el .qmd)
-
 # Directorio de salida
 output-dir: reports
 
 # Recursos (figuras auxiliares, logo)
+# NOTA: el path es relativo al directorio de salida (reports/).
+# Por eso listamos `logo-unimet.png` aquí, no `reports/logo-unimet.png`.
 resources:
   - logo-unimet.png
