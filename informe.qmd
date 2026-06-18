@@ -172,13 +172,13 @@ Esta es la firma cuantitativa de la hipótesis de Haidt sobre plataformas *image
 
 ## 4.3 Multi-panel: tres outcomes consistentes
 
-![Multi-panel](reports/figures/fig4_multi_panel.png){#fig-4}
+![Multi-panel](reports/figures/fig3_multi_panel.png){#fig-3}
 
 **Hallazgo.** Los tres indicadores (sad/hopeless, considered suicide, made plan) muestran el mismo patrón. Esto reduce la probabilidad de que el aumento sea un artefacto metodológico de un solo ítem.
 
 ## 4.4 Drill-down 2015-2021
 
-![Drill-down](reports/figures/fig3_drill_down.png){#fig-3}
+![Drill-down](reports/figures/fig4_drill_down.png){#fig-4}
 
 **Hallazgo.** El primer salto sostenido ocurre en 2015-2017 (+1.6pp). Luego 2017-2019 (+5.1pp, +16%) y 2019-2021 (+4.8pp, +13%). El COVID叠加 es visible pero **no es el único factor**.
 
@@ -196,7 +196,7 @@ Esta es la firma cuantitativa de la hipótesis de Haidt sobre plataformas *image
 
 ## 4.7 Ratio M/F mortalidad
 
-![Ratio M/F](reports/figures/fig8_mf_ratio.png){#fig-8}
+![Ratio M/F](reports/figures/fig7_mf_ratio.png){#fig-7}
 
 **Hallazgo.** Ratio M/F de mortalidad en 15-19 cayó de 3.78x (2010) a 2.46x (2024) — compresión del 35%. En 10-14, el ratio cayó de 1.88x a 1.05x (casi paridad). Esta **feminización del riesgo** es consistente con la hipótesis de Haidt.
 
@@ -236,7 +236,7 @@ Esto sugiere un **constructo subyacente común** (deterioro de salud mental), no
 
 **Lectura:** odds de sad/hopeless **casi se duplica** entre 2005 y 2021. Los hombres tienen **41% del odds** de las mujeres.
 
-![Forest plot OR](reports/figures/fig10_forest_or.png){#fig-10}
+![Forest plot OR](reports/figures/fig8_forest_or.png){#fig-8}
 
 ## 5.4 Regresión logística con screen time (2019)
 
@@ -292,7 +292,7 @@ Análisis estratificado por sexo × raza (8 categorías CDC) usando solo años d
 
 **Lectura:** **no hay inversión (Paradoja de Simpson)**, pero sí **heterogeneidad real**. Las mujeres suben en todas las razas (+6.7 a +14.4pp). Los hombres son más heterogéneos: hispanos y NHPI se mantienen estables o bajan ligeramente, mientras que blancos y nativos suben. La amplificación del gap de género es **universal entre mujeres** pero **no entre hombres**.
 
-![Simpson heatmap](reports/figures/fig11_simpson_heatmap.png){#fig-11}
+![Simpson heatmap](reports/figures/fig9_simpson_heatmap.png){#fig-9}
 
 ## 5.7 Divorcio YRBS vs NCHS
 
@@ -309,19 +309,19 @@ Cualitativamente:
 
 **Lectura:** las mujeres tienen 2x la depresión de los hombres pero **un tercio** de su mortalidad. **La mortalidad no captura la carga de salud mental femenina.**
 
-![Divorcio](reports/figures/fig9_depression_vs_mortality.png){#fig-9}
+![Divorcio](reports/figures/fig10_depression_vs_mortality.png){#fig-10}
 
 # 6. Discusión y storytelling {#sec-discusion}
 
 ## 6.1 Outliers: ¿hay grupos protegidos?
 
-![Outliers](reports/figures/fig12_outliers_grade.png){#fig-12}
+![Outliers](reports/figures/fig11_outliers_grade.png){#fig-11}
 
 **Hallazgo:** estratificado por sexo × grado (9-12), **no hay outliers protectores significativos**. Los menos afectados son Male freshmen (G9, +5pp). Las más afectadas son **Female G11-G12 seniors** (+14-15pp). El efecto es universal pero heterogéneo.
 
 ## 6.2 Zoom-out: panorama histórico 2000-2021
 
-![Zoom-out](reports/figures/fig13_zoomout_history.png){#fig-13}
+![Zoom-out](reports/figures/fig12_zoomout_history.png){#fig-12}
 
 **Hallazgo clave.** Mirando los 20 años completos con NCHS Data Brief 471:
 
@@ -333,7 +333,7 @@ El **punto de inflexión 2010-2015** coincide con la ventana del Great Rewiring.
 
 ## 6.3 Matriz de correlaciones
 
-![Correlaciones](reports/figures/fig14_correlation_matrix.png){#fig-14}
+![Correlaciones](reports/figures/fig13_correlation_matrix.png){#fig-13}
 
 **Hallazgo.** El año tiene correlación 0.92 con sad_hopeless, 0.79 con considered, 0.83 con plan. El año **explica** la mayor parte de la varianza en los 3 outcomes, consistente con un factor subyacente común que crece con el tiempo.
 
