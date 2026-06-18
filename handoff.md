@@ -184,6 +184,16 @@ Crucé `p1/correcciones.md` y `prac1/correcciones.md`. Patrones que importan:
 - `jupyter execute` en Windows lee con cp1252 por default → falla con UTF-8 directo
 - `PYTHONIOENCODING=utf-8` no soluciona el problema de read
 - **Workflow:** escribir con `ensure_ascii=True`, luego `nbformat.read` y `nbformat.write` para normalizar IDs
+- **CRÍTICO:** `jupyter execute` NO guarda los outputs en el archivo .ipynb. Usar en su lugar:
+  `jupyter nbconvert --to notebook --execute --inplace`
+
+### 9.4. BUG en cleaning: columna 'race' es ALTURA
+**Status: bug detectado en análisis 3.0, no corregido todavía.**
+- La columna 'race' en `yrbs_clean_2005_2021.parquet` realmente contiene **altura en metros** (valores 1.50-2.10)
+- Origen: error en el mapping del notebook 1.0 (cleaning). Un q-code (probablemente q4 o q5) terminó mapeado a 'race' cuando era height
+- 121,555 valores NaN (90%) y 13,119 con valores de altura reales
+- **Workaround aplicado:** análisis 3.0 Simpson usa 'hispanic' (8 categorías válidas) en lugar de 'race'
+- **Pendiente:** re-examinar cleaning 1.0, identificar q-code real de race, re-mapping. Probablemente afecta el notebook 1.0 (lo cambió de 'q4' o 'q5' a 'race' por error)
 
 ## 10. Quirks de herramientas y entorno
 
