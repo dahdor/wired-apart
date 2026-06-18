@@ -32,37 +32,45 @@ def assert_columns(df: pd.DataFrame, expected: list[str], source: str) -> None:
         )
 
 
-def load_mtf(path: Path | None = None) -> pd.DataFrame:
-    """Carga el dataset de Monitoring the Future desde `data/raw/`."""
-    path = path or (config.RAW_DIR / "mtf" / "mtf_public_use.csv")
+def load_yrbs(path: Path | None = None, year: int | None = None) -> pd.DataFrame:
+    """Carga un año del dataset YRBS desde `data/raw/yrbs/`.
+
+    El dataset se distribuye en formato Access (.mdb) y se lee con pyodbc
+    usando el driver ODBC de Microsoft Access (incluido en Windows).
+    Alternativa: usar read_table con mdbtools en Linux/macOS.
+
+    Para convertir a CSV/Parquet una vez (y no depender de pyodbc en cada
+    lectura), ver `notebooks/0.0-dh-data-acquisition.ipynb`.
+    """
+    if path is None:
+        if year is None:
+            raise ValueError("Provide either `path` or `year`.")
+        path = config.RAW_DIR / "yrbs" / f"yrbs{year}.mdb"
     if not path.exists():
         raise FileNotFoundError(
-            f"No se encontró el archivo MTF en {path}. "
-            "Verifica la descarga en data/raw/mtf/."
+            f"No se encontró el archivo YRBS en {path}. "
+            "Verifica la descarga en data/raw/yrbs/."
         )
-    # MTF se publica en distintos formatos (.sav, .dta, .csv). pyreadstat
-    # detecta el formato por extensión.
-    if path.suffix in {".sav", ".dta"}:
-        import pyreadstat
+    import pyodbc
 
-        df, _meta = pyreadstat.read_file(str(path))
-    else:
-        df = pd.read_csv(path, low_memory=False)
+    conn_str = (
+        r"Driver={Microsoft Access Driver (*.mdb, *.accdb)};"
+        f"DBQ={path};"
+    )
+    conn = pyodbc.connect(conn_str)
+    try:
+        df = pd.read_sql("SELECT * FROM [XXHq]", conn)
+    finally:
+        conn.close()
     return df
 
 
-def load_nsduh(path: Path | None = None) -> pd.DataFrame:
-    """Carga el dataset NSDUH desde `data/raw/`."""
-    path = path or (config.RAW_DIR / "nsduh" / "nsduh_public_use.csv")
+def load_wonder(path: Path | None = None) -> pd.DataFrame:
+    """Carga la extracción de CDC WONDER (suicidio adolescente) desde `data/raw/cdc/`."""
+    path = path or (config.RAW_DIR / "cdc" / "wonder_suicide_adolescent.csv")
     if not path.exists():
         raise FileNotFoundError(
-            f"No se encontró el archivo NSDUH en {path}. "
-            "Verifica la descarga en data/raw/nsduh/."
+            f"No se encontró el archivo WONDER en {path}. "
+            "Verifica la descarga en data/raw/cdc/."
         )
-    if path.suffix in {".sas7bdat", ".sav", ".dta"}:
-        import pyreadstat
-
-        df, _meta = pyreadstat.read_file(str(path))
-    else:
-        df = pd.read_csv(path, low_memory=False)
-    return df
+    return pd.read_csv(path, low_memory=False)

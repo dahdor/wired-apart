@@ -21,17 +21,16 @@ NOTEBOOKS_DIR = PROJECT_ROOT / "notebooks"
 REFERENCES_DIR = PROJECT_ROOT / "references"
 
 # --- Data sources (publicly available, US) -----------------------------------
-# Monitoring the Future (MTF) — University of Michigan / NIDA
-# Series 1975+, adolescents 8th, 10th, 12th grade.
-# Public download: https://monitoringthefuture.org/data-data
-MTF_URL = "https://monitoringthefuture.org/data-data"
-MTF_DATA_DICT = REFERENCES_DIR / "mtf_data_dictionary.md"
+# CDC Youth Risk Behavior Surveillance System (YRBS) — National High School
+# Series 1991-present, every odd year. Public download, Access/ASCII format.
+# Contains BOTH exposure (screen time, Q80) and outcomes (sadness, suicide, Q25-28).
+YRBS_URL = "https://www.cdc.gov/yrbs/data/index.html"
+YRBS_DATA_DICT = REFERENCES_DIR / "yrbs_data_dictionary.md"
 
-# National Survey on Drug Use and Health (NSDUH) — SAMHSA
-# Annual cross-sectional, ages 12+, with adolescent mental-health modules.
-# Public download: https://www.samhsa.gov/data/data-we-collect/nsduh
-NSDUH_URL = "https://www.samhsa.gov/data/data-we-collect/nsduh"
-NSDUH_DATA_DICT = REFERENCES_DIR / "nsduh_data_dictionary.md"
+# CDC WONDER — Underlying Cause of Death (compressed mortality file, 1999-2020)
+# Public query interface + API. Provides suicide rates by age/sex/year.
+WONDER_URL = "https://wonder.cdc.gov/ucd-icd10.html"
+WONDER_DATA_DICT = REFERENCES_DIR / "wonder_data_dictionary.md"
 
 # --- Time window for the analysis --------------------------------------------
 # The book dates "The Great Rewiring" to 2010-2015. We want 5 years of "before"

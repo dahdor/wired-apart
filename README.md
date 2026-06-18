@@ -17,7 +17,9 @@
 ## TL;DR
 
 - **Pregunta.** ¿En qué magnitud y con qué rapidez la transición a una "infancia basada en el teléfono" (2010–2015) se asocia con el deterioro de indicadores de bienestar adolescente en EE.UU., y qué marco de monitoreo e intervención digital permite medir y revertir ese efecto en entornos escolares?
-- **Método.** Replicación cuantitativa de los argumentos de *The Anxious Generation* (Haidt, 2024) integrando dos fuentes públicas: **Monitoring the Future (MTF)** —actitudes y conductas— y **National Survey on Drug Use and Health (NSDUH)** —diagnósticos clínicos—. Pipeline: limpieza con orden metodológico explícito (tipos → categorías → imposibles → faltantes), EDA, análisis de correlación segmentado, y verificación de la paradoja de Simpson.
+- **Método.** Replicación cuantitativa de los argumentos de *The Anxious Generation* (Haidt, 2024) integrando dos fuentes públicas: **CDC YRBS (Youth Risk Behavior Surveillance System)** —que combina en un solo dataset la exposición (horas de pantalla) y los outcomes (depresión, ideación suicida) en adolescentes de 9°-12° grado— y **CDC WONDER (Underlying Cause of Death)** —que provee las tasas de mortalidad por suicidio por edad/sexo/año—. Pipeline: limpieza con orden metodológico explícito (tipos → categorías → imposibles → faltantes), EDA, análisis de correlación segmentado, y verificación de la paradoja de Simpson.
+
+  > **Nota sobre la elección de datasets.** El plan original contemplaba MTF + NSDUH. Ambos requieren registro en portales restringidos (ICPSR y SAMHSA) que no son automatizables desde un pipeline reproducible. YRBS y WONDER son las dos fuentes públicas equivalentes que **el libro también cita** (la Figura 1.4 sobre visitas a urgencias por autolesión usa datos de YRBS) y permiten construir exactamente la misma evidencia, con la ventaja adicional de que YRBS incluye la variable de exposición (tiempo de pantalla) directamente.
 - **Hallazgos clave.** (se completan al final del análisis).
 - **Propuesta.** Framework de monitoreo *Phone-Free Schools* con métricas de proceso y resultado.
 
@@ -65,7 +67,7 @@ wired-apart/
 │
 └── wired_apart/              ← módulo Python de soporte
     ├── config.py             ← rutas, paleta, constantes
-    ├── dataset.py            ← carga de MTF y NSDUH
+    ├── dataset.py            ← carga de YRBS y WONDER
     ├── features.py           ← cohortes, períodos, tasas
     └── plots.py              ← estilo consistente + helper de narrativa
 ```
@@ -91,7 +93,7 @@ cd wired-apart
 make install
 
 # 3. Colocar los datos crudos en data/raw/  (ver references/data_provenance.md)
-#    MTF en data/raw/mtf/  y NSDUH en data/raw/nsduh/
+#    YRBS en data/raw/yrbs/  y WONDER en data/raw/cdc/
 
 # 4. Ejecutar todo el pipeline
 make all           # equivalente a: make pipeline && make report
@@ -114,13 +116,14 @@ make report
 
 | Dataset | Fuente | Unidad | Ventana | n (aprox.) | Variables clave |
 |---|---|---|---|---|---|
-| **Monitoring the Future (MTF)** | Universidad de Michigan / NIDA | Individual (8°, 10°, 12° grado) | 2005–2020 | ~15 000 / año | Satisfacción con uno mismo, soledad, horas de sueño, "casi a diario" con amigos |
-| **NSDUH** | SAMHSA | Individual (12+) | 2005–2020 | ~70 000 / año | Major depressive episode, ansiedad por edad y sexo |
+| **CDC YRBS** (National High School) | Centers for Disease Control and Prevention | Individual (~13 000 / año, 9°-12° grado) | 2005–2019 (años impares) | ~13 000 / año | Tiempo de pantalla (Q80), tristeza/sin esperanza (Q25), ideación suicida (Q26-28), peso/estatura, etnia, grado |
+| **CDC WONDER** (Underlying Cause of Death) | Centers for Disease Control and Prevention | Agregado (conteos + tasas por 100k) | 1999–2020 | Cobertura nacional completa | Tasas de suicidio por edad (10-14, 15-19), sexo y año, ICD-10 X60-X84 |
 
-**Por qué estos dos.** MTF mide *actitudes y conductas* reportadas; NSDUH mide *diagnósticos clínicos*. La integración es exactamente la que el libro utiliza para sostener su argumento. Cada dataset documenta su propia realidad parcial del fenómeno; juntos construyen evidencia robusta.
+**Por qué estos dos.** YRBS es un survey que combina la **exposición** (horas de pantalla/social media) con los **outcomes** (depresión, suicidios intentados) en la misma unidad de análisis (el adolescente), permitiendo análisis a nivel individual. WONDER provee los outcomes de **mortalidad** (suicidios consumados) que YRBS no captura porque su población es solo high school. Juntos permiten responder la pregunta de investigación en dos niveles: asociación individual (YRBS) y tendencia poblacional agregada (WONDER).
 
 **Limitaciones reportadas.**
-- NSDUH cambió de metodología en 2015 (rediseño del instrumento). Tratamos el cambio como punto de segmentación y lo declaramos explícitamente.
+- YRBS es bienal (años impares: 2005, 2007, ..., 2019). Para años pares no hay datos; los gráficos temporales se interpolan visualmente con líneas punteadas.
+- YRBS excluye adolescentes no escolarizados (mayor riesgo de depresión). Esto subestima la prevalencia real.
 - Los datos son de EE.UU. La transferibilidad a otros contextos (incluido Venezuela) se discute en el informe, no se asume.
 
 ---
