@@ -71,12 +71,11 @@ validate:
 validate-quick:
 	uv run python scripts/validate_pipeline.py --quick
 
-## Remove compiled Python files
+## Remove compiled Python files (cross-platform: usa Python, no `find`)
 .PHONY: clean
 clean:
-	find . -type f -name "*.py[co]" -delete
-	find . -type d -name "__pycache__" -delete
-	find . -type d -name ".ipynb_checkpoints" -exec rm -rf {} +
+	uv run python -c "import shutil, pathlib; [shutil.rmtree(p, ignore_errors=True) for p in pathlib.Path('.').rglob('__pycache__')]; [shutil.rmtree(p, ignore_errors=True) for p in pathlib.Path('.').rglob('.ipynb_checkpoints')]; [p.unlink(missing_ok=True) for p in pathlib.Path('.').rglob('*.py[co]')]"
+	@echo "Cleaned: __pycache__, .ipynb_checkpoints, *.pyc, *.pyo"
 
 ## Lint with ruff (use `make format` to do formatting)
 .PHONY: lint
