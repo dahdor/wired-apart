@@ -12,14 +12,15 @@ csl: references/apa.csl
 # Formatos de salida
 format:
   html:
-    # theme: default — usa las fuentes serif de Bootstrap (consistente
-    # en títulos y cuerpo). Diego prefiere la fuente default antes que
-    # cosmo (que mezcla sans-serif en títulos con serif en cuerpo).
+    # theme: default usa fuentes serif en el cuerpo. Forzamos serif
+    # también en los headings via styles.css.
     theme: default
+    css: styles.css
     toc: true
     toc-depth: 3
     toc-location: right
-    number-sections: true
+    # NO usamos number-sections: los headings del qmd ya tienen
+    # número literal (1, 2, 3, ...) para evitar duplicación 5.7. 4.7.
     code-fold: true
     code-tools: true
     fig-width: 8
@@ -30,9 +31,8 @@ format:
     documentclass: scrartcl
     papersize: letter
     toc: true
-    # El TOC comparte espacio con el resto del front matter (abstract, etc.)
-    # Diego prefiere que el TOC no esté en una página aislada.
-    number-sections: true
+    # NO usamos number-sections: los headings del qmd ya tienen
+    # número literal (1, 2, 3, ...) para evitar duplicación 5.7. 4.7.
     fig-width: 7
     fig-height: 4.5
     fig-dpi: 200
@@ -43,6 +43,13 @@ format:
         \fancyhead[L]{\small Wired Apart}
         \fancyhead[R]{\small Diego Hernández}
         \fancyfoot[C]{\thepage}
+        % Forzar serif en todos los headings (KOMA-Script usa sans por default)
+        \setkomafont{disposition}{\rmfamily\bfseries}
+        \addtokomafont{section}{\rmfamily\bfseries}
+        \addtokomafont{subsection}{\rmfamily\bfseries}
+        \addtokomafont{subsubsection}{\rmfamily\bfseries}
+        \addtokomafont{paragraph}{\rmfamily\bfseries}
+        \addtokomafont{subparagraph}{\rmfamily\bfseries}
 
 # Ejecución: ocultamos el código en el HTML por defecto
 execute:
