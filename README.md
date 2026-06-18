@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/report-Quarto-74A0CF?logo=quarto" />
 </a>
 
-> **Cuantificando el coste de la childhood digital sobre el bienestar adolescente (EE.UU., 2005–2020).**
+> **Cuantificando el coste de la childhood digital sobre el bienestar adolescente (EE.UU., 2005–2021).**
 
 ---
 
@@ -54,17 +54,19 @@ wired-apart/
 │
 ├── notebooks/                ← Jupyter notebooks del pipeline (8 en total)
 │   ├── 0.0-dh-data-acquisition.ipynb
-│   ├── 1.0-dh-mtf-cleaning.ipynb
-│   ├── 1.1-dh-nsduh-cleaning.ipynb
-│   ├── 2.0-dh-eda-mtf.ipynb
-│   ├── 2.1-dh-eda-nsduh.ipynb
+│   ├── 1.0-dh-yrbs-cleaning.ipynb
+│   ├── 1.1-dh-wonder-cleaning.ipynb
+│   ├── 2.0-dh-eda-yrbs.ipynb
+│   ├── 2.1-dh-eda-wonder.ipynb
 │   ├── 3.0-dh-analysis.ipynb
 │   ├── 4.0-dh-storytelling.ipynb
 │   └── 5.0-dh-solution.ipynb
 │
 ├── references/               ← data dictionaries y documentación de fuentes
-│   ├── mtf_data_dictionary.md
-│   ├── nsduh_data_dictionary.md
+│   ├── yrbs_data_dictionary.md
+│   ├── wonder_data_dictionary.md
+│   ├── references.bib
+│   ├── apa.csl
 │   └── data_provenance.md    ← hashes SHA-256, fechas de descarga, URLs
 │
 ├── reports/                  ← entregables finales

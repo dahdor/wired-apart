@@ -48,16 +48,18 @@ format:
 	uv run ruff format
 
 ## Run the full analysis pipeline (data → features → analysis → figures)
+## IMPORTANT: uses jupyter nbconvert --execute --inplace (not jupyter execute)
+## because the latter doesn't save outputs to the .ipynb file on Windows.
 .PHONY: pipeline
 pipeline: clean
-	uv run jupyter execute notebooks/0.0-dh-data-acquisition.ipynb
-	uv run jupyter execute notebooks/1.0-dh-mtf-cleaning.ipynb
-	uv run jupyter execute notebooks/1.1-dh-nsduh-cleaning.ipynb
-	uv run jupyter execute notebooks/2.0-dh-eda-mtf.ipynb
-	uv run jupyter execute notebooks/2.1-dh-eda-nsduh.ipynb
-	uv run jupyter execute notebooks/3.0-dh-analysis.ipynb
-	uv run jupyter execute notebooks/4.0-dh-storytelling.ipynb
-	uv run jupyter execute notebooks/5.0-dh-solution.ipynb
+	uv run jupyter nbconvert --to notebook --execute --inplace notebooks/0.0-dh-data-acquisition.ipynb
+	uv run jupyter nbconvert --to notebook --execute --inplace notebooks/1.0-dh-yrbs-cleaning.ipynb
+	uv run jupyter nbconvert --to notebook --execute --inplace notebooks/1.1-dh-wonder-cleaning.ipynb
+	uv run jupyter nbconvert --to notebook --execute --inplace notebooks/2.0-dh-eda-yrbs.ipynb
+	uv run jupyter nbconvert --to notebook --execute --inplace notebooks/2.1-dh-eda-wonder.ipynb
+	uv run jupyter nbconvert --to notebook --execute --inplace notebooks/3.0-dh-analysis.ipynb
+	uv run jupyter nbconvert --to notebook --execute --inplace notebooks/4.0-dh-storytelling.ipynb
+	uv run jupyter nbconvert --to notebook --execute --inplace notebooks/5.0-dh-solution.ipynb
 
 ## Render the Quarto report
 .PHONY: report

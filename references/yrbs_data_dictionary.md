@@ -1,6 +1,7 @@
 # Data Dictionary — CDC YRBS (Youth Risk Behavior Surveillance System)
 
-> _Actualizado en la Fase 2 del proyecto, después de descargar los datos._
+> _Actualizado en la revisión jun-2026, tras detectar bugs en la versión
+> inicial. Las definiciones de Q4, Q5 y Q80 estaban equivocadas._
 
 ## Descripción general
 
@@ -19,49 +20,83 @@ particularmente útil para análisis de asociación a nivel individual.
 
 - **URL oficial:** https://www.cdc.gov/yrbs/data/index.html
 - **Formato de distribución:** Access (`.mdb`) y ASCII
-- **Ventana descargada:** 2005–2019 (años impares: 2005, 2007, 2009, 2011, 2013, 2015, 2017, 2019)
+- **Ventana descargada:** **2005–2021** (años impares: 2005, 2007, 2009, 2011, 2013, 2015, 2017, 2019, 2021)
 - **Driver ODBC para Python:** `Microsoft Access Driver (*.mdb, *.accdb)` (incluido en Windows)
 - **Conversión a CSV/Parquet:** se hace en `notebooks/0.0-dh-data-acquisition.ipynb` y se guarda en `data/processed/yrbs_<year>.parquet` para no depender de ODBC en cada lectura.
 
-## Variables de interés para este proyecto
+## Variables demográficas (crudas)
 
-| Variable YRBS | Variable cruda (Q-code) | Tipo | Valores | Uso en el análisis |
-|---|---|---|---|---|
-| Año de encuesta | (metadato del archivo) | int | 2005-2019 | Línea temporal principal |
-| Edad | `q1` | int | 1=12y, 2=13y, ..., 7=18+y | Segmentación |
-| Sexo | `q2` | int | 1=Female, 2=Male | **Segmentación por género** (clave para Haidt cap. 6) |
-| Grado | `q3` | int | 1=9°, 2=10°, 3=11°, 4=12° | Segmentación |
-| Hispanidad | `q4` | int | 1=Yes, 2=No | Covariable |
-| Raza (multi) | `q5` (multi-selección) | int por cat | 1=AI/AN, 2=Asian, 3=Black, 4=NH/PI, 5=White, 6=Hispanic/Latino (overlap) | Covariable |
-| **Sad or hopeless (depresión)** | **`q25`** | int | 1=Yes, 2=No | **Outcome principal: depresión autopercibida** |
-| Considered suicide | `q26` | int | 1=Yes, 2=No | Outcome secundario |
-| Made a suicide plan | `q27` | int | 1=Yes, 2=No | Outcome secundario |
-| Attempted suicide | `q28` | int | 1-5 (veces) | Outcome secundario |
-| **TV watching (horas/día)** | **`q79`** | int | 1=No, 2=<1h, 3=1h, 4=2h, 5=3h, 6=4h, 7=5+h | Exposición parcial |
-| **Screen time (horas/día, incluye social media)** | **`q80`** | int | 1=No, 2=<1h, 3=1h, 4=2h, 5=3h, 6=4h, 7=5+h | **Exposición principal** |
-| Peso muestral | `weight` | float | — | **Necesario** para análisis correcto |
-| Estrato | `stratum` | float | — | Necesario para diseño muestral complejo |
-| PSU | `psu` | float | — | Necesario para diseño muestral complejo |
+| Q-code | Variable | Tipo | Valores RAW (1ª versión cleaning) | Valores CORRECTOS | Notas |
+|---|---|---|---|---|---|
+| `q1` | Edad | int | 1=12y, 2=13y, ..., 6=17y, 7=18+y | ✅ correcto | |
+| `q2` | Sexo | int | 1=Female, 2=Male | ✅ correcto | |
+| `q3` | Grado | int | 1=9°, 2=10°, 3=11°, 4=12°, 5=Ungraded/Other | ✅ correcto | |
+| `q4` | **Hispanic/Latino origin** | int (binario) | "1=Yes, 2=No" | ⚠️ Solo 2007+. **2005 tiene 8 categorías** (origen hispano detallado: Mexican, Puerto Rican, etc.) | En `yrbs_clean`: `hispanic` (crudo) y `hispanic_yesno` (unificado 1=Yes, 0=No) |
+| `q5` | **HEIGHT (altura)** | float | ❌ Estábamos usando como "race" | ✅ Height in meters (1.27-2.11) | NO es race. Ver `raceeth` abajo. |
+| `q6` | WEIGHT (peso) | float | — | ✅ Weight in kg | |
+| `raceeth` | **Raza-Etnia (derivada CDC)** | string (8 cats) | ❌ NO se usaba | ✅ 1=AI/AN, 2=Asian, 3=Black, 4=NHPI, 5=White, 6=Hispanic, 7=Multi, 8=Unknown | **Solo válida 2007+** (97%). 2005 = NaN. |
+| `raceorig` | Raza original (multi-selección) | string (30 cats) | — | ⚠️ No usada | Solo 2005 (71%). |
 
-## Pesos muestrales y diseño complejo
+**⚠️ Bug corregido en jun-2026:** la columna `race` en `yrbs_clean_2005_2021.parquet` ahora es `raceeth` (string, 8 cats). La versión anterior mapeaba `q5` (altura) a `race`, lo que producía valores como 1.70m en una columna categórica.
+
+## Outcomes de salud mental (con crosswalk Q-codes)
+
+⚠️ **Importante:** los Q-codes rotan cada 2 años para evitar priming effects
+(mismo concepto, número de pregunta cambia). La redacción se mantiene
+estable. **Verificamos empíricamente** que las distribuciones (% yes) por año
+coinciden con el codebook oficial.
+
+| Concepto | 2005-2009 | 2011 | 2013-2015 | 2017-2021 | Validación |
+|---|---|---|---|---|---|
+| sad/hopeless (depresión) | Q23 | Q24 | Q26 | Q25 | 2019=36.7% matchea CDC ✅ |
+| Considered suicide | Q24 | Q25 | Q27 | Q26 | |
+| Made plan | Q25 | Q26 | Q28 | Q27 | |
+| Attempted suicide (bin) | Q22 (bin) | Q27 | Q29 (ord) | Q28 | 2009 ordinal: 0/1/2-3/4-5/6+ |
+| Attempted suicide (ord) | — | — | Q29 | — | Solo 2009, 2013-2015 |
+| Electronically bullied | Q21/22 | Q23 | Q25 | Q24 | |
+| Bullied on school property | Q20/21 | Q22 | Q24 | Q23 | |
+
+**Crosswalk completo y validado** en `wired_apart/dataset.py → YRBS_QCODE_CROSSWALK`.
+
+## Exposición: Screen time (Q80)
+
+⚠️ **CRÍTICO — solo 2019 es válido para screen time "moderno":**
+
+| Año | Q80 en realidad | ¿Es screen time? |
+|---|---|---|
+| 2009 | Physical activity 60 min/day | ❌ |
+| 2011 | TV watching (≥3 h/día) | ⚠️ Parcial |
+| 2013 | Physical activity 60 min/day | ❌ |
+| 2015 | Physical activity 60 min/day | ❌ |
+| 2017 | TV watching (≥3 h/día) | ⚠️ Parcial |
+| **2019** | **"Video/computer/games + social media" (la métrica de Haidt)** | ✅ |
+| 2021 | Sports teams participation | ❌ |
+
+**Conclusión:** el análisis de screen time es **transversal (2019 solamente)**, no de serie de tiempo. La `screen_time` en `yrbs_clean` solo tiene valores no-NaN para 2019.
+
+## Variables de diseño muestral
+
+| Variable | Tipo | Significado |
+|---|---|---|
+| `weight` | float | Peso muestral. **Necesario** para análisis correcto. |
+| `stratum` | float (16 valores) | Estrato del diseño muestral complejo. |
+| `psu` | float (396 valores) | Primary Sampling Unit (conglomerado). |
 
 YRBS usa un **diseño muestral complejo por conglomerados** (stratified
 two-stage cluster sample). Para producir estimadores puntuales y errores
 estándar correctos, todos los análisis deben usar `weight` como peso y
-`stratum`+`psu` para identificar los conglomerados. En Python usamos
-`statsmodels` con su soporte para diseño muestral complejo.
-
-**Implicación para el informe:** reportamos estimaciones ponderadas
-(porcentajes de la población) y usamos los pesos para todos los análisis
-inferenciales.
+`stratum`+`psu` para identificar los conglomerados.
 
 ## Cambios de redacción entre años
 
-Las preguntas se renumeran en algunos años. Por ejemplo, la pregunta de
-"tiempo de pantalla" (Q80 en 2019) no existía antes de 2013. La pregunta
-"tristeza/sin esperanza" (Q25) ha estado presente consistentemente desde
-2005 pero su ubicación en el cuestionario ha cambiado. Documentamos cada
-cambio en la limpieza (Fase 3) con tabla de mapeo entre años.
+- **2005 vs 2007+:** El formato de la pregunta de origen hispano (q4) cambió.
+  En 2005 traía 8 categorías detalladas (Mexican, Puerto Rican, Central/South
+  American, Cuban, Other Hispanic, Not Hispanic, Multiple Hispanic, Unknown).
+  En 2007+ se simplificó a binario (Yes/No). En `yrbs_clean`:
+  - `hispanic` conserva la codificación cruda (útil para 2005).
+  - `hispanic_yesno` es la versión unificada (1=Yes, 0=No) para 2007+.
+- **2019 vs otros años:** la pregunta de screen time (Q80) tiene redacción
+  diferente (incluye social media + video games) **solo en 2019**.
 
 ## Limitaciones generales
 
@@ -75,8 +110,8 @@ cambio en la limpieza (Fase 3) con tabla de mapeo entre años.
   datos del survey. En gráficos temporales conectamos los puntos con líneas
   punteadas para indicar la interpolación implícita.
 - **Cambios de metodología.** El cuestionario se ha revisado varias veces.
-  Las variables de "screen time" solo existen desde 2013. Documentamos
-  explícitamente qué variables están disponibles en qué años.
+  Las variables de "screen time" solo existen desde 2013, y solo 2019
+  captura la métrica de Haidt (redes sociales + video).
 
 ## Datos faltantes y valores especiales
 
@@ -84,3 +119,11 @@ En los archivos Access de YRBS, los valores faltantes suelen estar codificados
 como números altos (e.g., 7 para Q25 cuando la respuesta es missing). En el
 ASCII tienen códigos específicos. Documentamos los valores válidos y de
 missing en la limpieza (Fase 3).
+
+## Outputs limpios
+
+- `data/processed/yrbs_2005_2021.parquet`: stacked raw, 134,674 × 230 cols.
+  Contiene TODAS las q-vars + columnas derivadas CDC.
+- `data/processed/yrbs_clean_2005_2021.parquet`: limpio y unificado,
+  134,674 × 17 cols (15 originales + 2 nuevas en jun-2026:
+  `hispanic_yesno` y `race_raw`).

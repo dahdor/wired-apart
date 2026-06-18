@@ -33,10 +33,16 @@ WONDER_URL = "https://wonder.cdc.gov/ucd-icd10.html"
 WONDER_DATA_DICT = REFERENCES_DIR / "wonder_data_dictionary.md"
 
 # --- Time window for the analysis --------------------------------------------
-# The book dates "The Great Rewiring" to 2010-2015. We want 5 years of "before"
-# and 5 years of "after" that window, plus the post-COVID inflection in 2020.
+# YRBS surveys run every odd year (2005, 2007, ... 2021). We include 9 waves
+# to cover 5 years before the Great Rewiring (2005-2009), the rewiring window
+# itself (2010-2015), and the post-rewiring + COVID era (2017-2021).
 ANALYSIS_START_YEAR = 2005
-ANALYSIS_END_YEAR = 2020
+ANALYSIS_END_YEAR = 2021
+
+# Great Rewiring window per Haidt (2024). Used by the
+# `highlight_period` plot helper and the `assign_rewiring_period` feature.
+REWIRING_START_YEAR = 2010
+REWIRING_END_YEAR = 2015
 
 # --- Output paths ------------------------------------------------------------
 INFORME_QMD = PROJECT_ROOT / "informe.qmd"

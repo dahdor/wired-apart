@@ -1,7 +1,7 @@
 [project]
 name = "wired-apart"
 version = "0.1.0"
-description = "Cuantificando el coste de la childhood digital sobre el bienestar adolescente (EE.UU., 2005-2020)"
+description = "Cuantificando el coste de la childhood digital sobre el bienestar adolescente (EE.UU., 2005-2021)"
 authors = [
     { name = "Diego Hernández", email = "diego.hernandez@example.com" },
 ]
@@ -13,7 +13,8 @@ classifiers = [
     "Topic :: Scientific/Engineering",
     "Intended Audience :: Education",
 ]
-keywords = ["data-analysis", "adolescent-mental-health", "digital-wellbeing", "storytelling"]
+keywords = ["data-analysis", "adolescent-mental-health", "digital-wellbeing", "storytelling",
+            "YRBS", "NCHS", "suicide-prevention", "Phone-Free-Schools"]
 requires-python = ">=3.12"
 
 dependencies = [
@@ -23,19 +24,22 @@ dependencies = [
     # Visualization
     "matplotlib>=3.9",
     "seaborn>=0.13",
-    "plotly>=5.22",
     # Statistics
     "scipy>=1.13",
     "statsmodels>=0.14",
-    # I/O for SPSS/Stata (MTF is in SPSS; NSDUH has SAS/SPSS exports)
-    "pyreadstat>=1.2",
+    # I/O for YRBS Access files (Microsoft Access ODBC driver, Windows-only)
+    "pyodbc>=5.0",
+    # Parquet/Arrow for efficient storage of processed data
+    "pyarrow>=15",
     # Notebooks
     "jupyter>=1.1",
     "jupytext>=1.16",
     "ipykernel>=6.29",
+    "nbformat>=5.10",
     # Utilities
     "tqdm>=4.66",
     "pyyaml>=6.0",
+    "requests>=2.31",
 ]
 
 [project.optional-dependencies]

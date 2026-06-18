@@ -68,22 +68,54 @@ def load_yrbs(path: Path | None = None, year: int | None = None) -> pd.DataFrame
 def load_yrbs_processed(path: Path | None = None) -> pd.DataFrame:
     """Carga el stacked YRBS (9 años) desde `data/processed/yrbs_2005_2021.parquet`.
 
-    Este es el archivo que produce el notebook 0.0-dh-data-acquisition.
-    Usar este loader en lugar de `load_yrbs` para evitar la dependencia de
-    pyodbc en cada lectura.
+    Este es el stacked raw de 9 años producido por `notebooks/0.0-dh-data-acquisition`.
+    Contiene TODAS las q-vars del codebook original (q1-q99) más las columnas
+    derivadas de CDC (`raceeth`, `raceorig`, `weight`, `stratum`, `psu`).
+
+    Usar este loader en lugar de `load_yrbs` para evitar la dependencia de pyodbc
+    en cada lectura.
 
     Returns
     -------
     pd.DataFrame
-        134,674 registros × 230 columnas, con una columna `year` (2005-2021)
-        y todas las q-vars del cuestionario original en formato float64
-        (NaN donde no aplica).
+        134,674 registros × 230 columnas (stacked raw), con una columna `year`
+        (2005-2021) y todas las q-vars del cuestionario original en formato
+        float64 (NaN donde no aplica).
+
+    Para el dataset limpio (15 columnas, con crosswalk aplicado), usar
+    `load_yrbs_clean`.
     """
     path = path or (config.PROCESSED_DIR / "yrbs_2005_2021.parquet")
     if not path.exists():
         raise FileNotFoundError(
             f"No se encontró el archivo procesado en {path}. "
             "Ejecuta notebooks/0.0-dh-data-acquisition.ipynb primero."
+        )
+    return pd.read_parquet(path)
+
+
+def load_yrbs_clean(path: Path | None = None) -> pd.DataFrame:
+    """Carga el YRBS limpio y unificado (9 años) desde
+    `data/processed/yrbs_clean_2005_2021.parquet`.
+
+    Este es el output de `notebooks/1.0-dh-yrbs-cleaning`. Contiene 15 columnas
+    con nombres semánticos (no q-codes), producidas aplicando el YRBS_QCODE_CROSSWALK.
+
+    Returns
+    -------
+    pd.DataFrame
+        134,674 registros × 15 columnas: `year`, `age`, `sex`, `grade`,
+        `hispanic` (categórico: 1=Yes / 2=No para 2007+; 8 cats para 2005),
+        `hispanic_yesno` (1=Yes / 0=No unificado para todos los años),
+        `race` (8 cats, derivado de CDC `raceeth`), `weight`, `stratum`, `psu`,
+        `sad_hopeless`, `considered_suicide`, `made_plan`,
+        `attempted_suicide_yesno`, `attempted_suicide_ordinal`, `screen_time`.
+    """
+    path = path or (config.PROCESSED_DIR / "yrbs_clean_2005_2021.parquet")
+    if not path.exists():
+        raise FileNotFoundError(
+            f"No se encontró el archivo limpio en {path}. "
+            "Ejecuta notebooks/1.0-dh-yrbs-cleaning.ipynb primero."
         )
     return pd.read_parquet(path)
 
@@ -187,17 +219,44 @@ def load_wonder(path: Path | None = None) -> pd.DataFrame:
 
 
 def load_wonder_processed(path: Path | None = None) -> pd.DataFrame:
-    """Carga la mortalidad adolescente (suicidio) desde NCHS Socrata,
-    procesada en `data/processed/wonder_suicide_adolescent_2018_2024.csv`.
+    """Carga la mortalidad adolescente (suicidio) limpia y combinada,
+    desde `data/processed/wonder_clean_2005_2024.csv`.
 
-    Esta es la serie de mortalidad 2018-2024 que produce el notebook 0.0.
-    Para 2005-2017 ver limitations: el WONDER API no respondió durante la
-    fase de adquisición y se optó por declarar el rango disponible.
+    Este archivo se produce en `notebooks/1.1-dh-wonder-cleaning` combinando:
+    - NCHS Socrata 2018-2024 (28 filas con IC95%).
+    - NCHS Health, United States 2018 Table 9 (PDF público), 12 filas para
+      2010/2016/2017 (sin IC95%).
+
+    Returns
+    -------
+    pd.DataFrame
+        40 filas × 9 columnas: `year`, `sex_age`, `sex`, `rate_per_100k`,
+        `se`, `lci`, `uci`, `estimate_type`, `source` (Socrata | HUS2018).
+
+    Gaps documentados: 2005-2009 y 2011-2015. El CDC WONDER API
+    (D76/D77/D158/D176) rechaza queries programáticas con HTTP 400, por lo
+    que no se pudo automatizar la descarga de esos años. Ver
+    `references/data_provenance.md` para detalle.
+    """
+    path = path or (config.PROCESSED_DIR / "wonder_clean_2005_2024.csv")
+    if not path.exists():
+        raise FileNotFoundError(
+            f"No se encontró el archivo procesado en {path}. "
+            "Ejecuta notebooks/1.1-dh-wonder-cleaning.ipynb primero."
+        )
+    return pd.read_csv(path)
+
+
+def load_wonder_socrata_only(path: Path | None = None) -> pd.DataFrame:
+    """Carga solo la parte de NCHS Socrata (2018-2024, 28 filas, con IC95%).
+
+    Útil cuando se quiere análisis restringido a Socrata (sin los puntos
+    HUS que no tienen IC).
     """
     path = path or (config.PROCESSED_DIR / "wonder_suicide_adolescent_2018_2024.csv")
     if not path.exists():
         raise FileNotFoundError(
-            f"No se encontró el archivo procesado en {path}. "
+            f"No se encontró el archivo Socrata en {path}. "
             "Ejecuta notebooks/0.0-dh-data-acquisition.ipynb primero."
         )
     return pd.read_csv(path)

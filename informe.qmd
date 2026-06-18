@@ -9,8 +9,8 @@ abstract: |
   dos datasets públicos estadounidenses — *Youth Risk Behavior Survey* (YRBS, 9 olas bianuales
   2005-2021, n = 134 674) y mortalidad adolescente por suicidio (NCHS Socrata + Health,
   United States 2018 Table 9) — demostramos que el porcentaje de estudiantes que reportan
-  haberse sentido "tristes o desesperanzados" 2+ semanas seguidas subió de 28.6% (2005) a
-  41.5% (2021), con un aumento desproporcionado en mujeres (36.4% → 55.6%, +53%). La
+  haberse sentido "tristes o desesperanzados" 2+ semanas seguidas subió de 28.5% (2005) a
+  42.3% (2021), con un aumento desproporcionado en mujeres (36.7% → 56.6%, +54%). La
   regresión logística con pesos muestrales (n = 131 936) muestra un OR de 1.93 (IC95
   1.84-2.03) para 2021 vs 2005, controlando por sexo y edad. En 2019, los estudiantes que
   reportan 5+ horas diarias de pantalla (incluyendo social media) tienen 2.14x el odds de
@@ -36,9 +36,9 @@ lang: es
 
 **Hallazgos principales.**
 
-1. **Tendencia global:** sad/hopeless autopercibido subió de 28.6% (2005) a 41.5% (2021) — un **aumento de 43%** en 16 años. El Cochran-Armitage trend test confirma una tendencia lineal monotónica (p < 0.001).
+1. **Tendencia global:** sad/hopeless autopercibido subió de 28.5% (2005) a 42.3% (2021) — un **aumento de 48%** en 16 años. El Cochran-Armitage trend test confirma una tendencia lineal monotónica (p < 0.001).
 
-2. **Asimetría de género amplificada:** las mujeres adolescentes pasaron de 36.4% a 55.6% (+19.2pp, +53%); los hombres de 20.1% a 28.0% (+7.9pp, +39%). El gap de género creció de 16.3pp a **27.6pp** (amplificación del 70%).
+2. **Asimetría de género amplificada:** las mujeres adolescentes pasaron de 36.7% a 56.6% (+19.9pp, +54%); los hombres de 20.4% a 28.6% (+8.2pp, +40%). El gap de género creció de 16.4pp a **28.0pp** (amplificación del 71%).
 
 3. **Dosis-respuesta con screen time (2019):** OR ajustados de 0.95 (1h/día), 1.14 (2h), 1.32 (3h), 1.85 (4h), **2.14 (5+h/día)** vs no-uso. Asociación monotónica estadísticamente significativa.
 
@@ -159,13 +159,13 @@ Cinco figuras narradas del YRBS (notebook 2.0) y cuatro de mortalidad (notebook 
 
 ![Tendencia 2005-2021](reports/figures/fig1_sad_hopeless_trend.png){#fig-1}
 
-**Hallazgo cuantitativo.** Sad/hopeless subió de 28.6% (2005) a 41.5% (2021), un **aumento de 12.9pp (43%)** en 16 años. La aceleración post-2015 es visible.
+**Hallazgo cuantitativo (estimaciones ponderadas, YRBS).** Sad/hopeless autopercibido subió de **28.5% (2005) a 42.3% (2021)**, un **aumento de 13.8pp (+48%)** en 16 años. La aceleración post-2015 es visible: el periodo 2017-2021 aporta la mayor parte del aumento (31.5% → 42.3%, +10.8pp).
 
 ## 4.2 Asimetría de género amplificándose
 
 ![Gap de género](reports/figures/fig2_sex_gap.png){#fig-2}
 
-**Hallazgo cuantitativo.** Las mujeres pasaron de 36.4% (2005) a 55.6% (2021), un aumento de +19.2pp (+53%). Los hombres pasaron de 20.1% a 28.0% (+7.9pp, +39%). El gap de género creció de 16.3pp (2005) a **27.6pp (2021)** — una **amplificación del 70%**.
+**Hallazgo cuantitativo (estimaciones ponderadas, YRBS).** Las mujeres pasaron de **36.7% (2005) a 56.6% (2021)**, un aumento de +19.9pp (+54%). Los hombres pasaron de 20.4% a 28.6% (+8.2pp, +40%). El gap de género creció de **16.4pp (2005) a 28.0pp (2021)** — una **amplificación del 71%**.
 
 Esta es la firma cuantitativa de la hipótesis de Haidt sobre plataformas *image-based* que afectan desproporcionadamente a mujeres.
 
@@ -266,16 +266,30 @@ Esto sugiere un **constructo subyacente común** (deterioro de salud mental), no
 
 ## 5.6 Paradoja de Simpson
 
-Análisis estratificado por sexo × origen hispano (no por raza, porque la columna `race` en el cleaning quedó mal mapeada a altura — ver limitaciones).
+Análisis estratificado por sexo × raza (8 categorías CDC) usando solo años donde `raceeth` está disponible (2007+, ya que la columna derivada no existe en 2005). Pre = 2007-2009, post = 2017-2021.
 
-| Sexo | Origen | Pre % | Post % | Δ (pp) | OR |
-|---|---|---|---|---|---|
-| Female | Mexican | 40.5 | 53.8 | **+13.3** | 1.71 |
-| Female | Puerto Rican | 33.5 | 46.8 | **+13.3** | 1.74 |
-| Male | Puerto Rican | 18.7 | 25.2 | +6.6 | 1.47 |
-| Male | Mexican | 26.7 | 27.0 | +0.3 | 1.02 |
+**Importante:** la columna `race` en la versión original del cleaning estaba mal mapeada a altura en metros (q5). Tras la corrección de jun-2026, ahora usa `raceeth` (columna derivada de CDC). El Simpson analysis se re-ejecutó con la columna correcta.
 
-**Lectura:** **no hay Paradoja de Simpson** — todos los subgrupos muestran aumento (excepto Male Mexican, que tiene n pequeño y muestra cambio no significativo).
+| Sexo | Raza (CDC) | Pre % | Post % | Δ (pp) |
+|---|---|---|---|---|
+| Female | AmIndian | 43.9 | 58.3 | **+14.4** |
+| Female | Asian | 26.3 | 40.2 | +13.9 |
+| Female | Black | 36.3 | 42.9 | +6.7 |
+| Female | Hispanic | 39.4 | 50.2 | +10.8 |
+| Female | Multi | 42.3 | 52.4 | +10.1 |
+| Female | NHPI | 39.1 | 50.4 | +11.4 |
+| Female | Unknown | 40.8 | 54.4 | +13.5 |
+| Female | White | 33.1 | 46.0 | +12.9 |
+| Male | AmIndian | 17.5 | 23.5 | +6.0 |
+| Male | Asian | 23.3 | 26.1 | +2.8 |
+| Male | Black | 21.4 | 21.6 | +0.2 |
+| Male | Hispanic | 24.2 | 23.9 | **−0.3** |
+| Male | Multi | 25.2 | 29.5 | +4.3 |
+| Male | NHPI | 31.5 | 26.8 | **−4.8** |
+| Male | Unknown | 28.2 | 31.0 | +2.8 |
+| Male | White | 18.3 | 24.4 | +6.1 |
+
+**Lectura:** **no hay inversión (Paradoja de Simpson)**, pero sí **heterogeneidad real**. Las mujeres suben en todas las razas (+6.7 a +14.4pp). Los hombres son más heterogéneos: hispanos y NHPI se mantienen estables o bajan ligeramente, mientras que blancos y nativos suben. La amplificación del gap de género es **universal entre mujeres** pero **no entre hombres**.
 
 ![Simpson heatmap](reports/figures/fig11_simpson_heatmap.png){#fig-11}
 
@@ -347,8 +361,8 @@ Nuestros hallazgos son consistentes con:
 
 | KPI | Línea base | Meta | Plazo |
 |---|---|---|---|
-| sad/hopeless overall | 41.5% (2021) | 33% | 2 años |
-| sad/hopeless mujeres | 55.6% (2021) | 45% | 2 años |
+| sad/hopeless overall | 42.3% (2021) | 33% | 2 años |
+| sad/hopeless mujeres | 56.6% (2021) | 45% | 2 años |
 | Screen time 5+h/día | 25% (2019) | 10% | 1 año |
 | Mortalidad 15-19 | 6/100k | ≤6/100k | 5 años |
 | Cyberbullying reportado | 15% (2021) | 10% | 2 años |
@@ -375,7 +389,7 @@ ROI estimado: 3-5x en costos evitados de salud mental (Lee et al. 2022, Lancet C
 
 2. **La transición a infancia phone-based (2010-2015) coincide con un cambio de régimen** tanto en la depresión autopercibida (+9.5pp post vs pre) como en la mortalidad por suicidio (+60% en 15-19 entre 2010-2018).
 
-3. **El gap de género se amplió 70%** (16.3pp → 27.6pp), con mujeres pasando de 36% a 56% sad/hopeless.
+3. **El gap de género se amplió 71%** (16.4pp → 28.0pp), con mujeres pasando de 36.7% a 56.6% sad/hopeless.
 
 4. **La dosis-respuesta screen time es monotónica y robusta** (OR 2.14 para 5+h/día, 2019).
 
@@ -392,7 +406,8 @@ ROI estimado: 3-5x en costos evitados de salud mental (Lee et al. 2022, Lancet C
 - **Screen time solo 2019** (Q80 con redacción correcta).
 
 ### De datos
-- **Bug en cleaning:** la columna `race` quedó mal mapeada a altura en el cleaning 1.0. Workaround: usamos `hispanic` para Simpson. Pendiente re-examinar.
+- **Bug en cleaning 1.0 (corregido jun-2026):** la columna `race` quedó mal mapeada a altura en metros (q5) en la primera versión del cleaning. **Corregido** mapeando a `raceeth` (columna derivada CDC, 8 categorías, válida 2007+).
+- **Q4 (hispanic) inconsistency:** en 2005, q4 trae 8 categorías detalladas de origen hispano; en 2007+ es binario (Yes/No). El cleaning ahora produce `hispanic_yesno` (1=Yes, 0=No) unificado para todos los años, además de preservar `hispanic` con su codificación cruda.
 - **Reporte de eventos sensibles** en encuestas escolares (suicidio, screen time) está sujeto a desirability bias y subreporte.
 
 ### De generalización

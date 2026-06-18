@@ -19,15 +19,40 @@ def assign_birth_cohort(year_col: pd.Series, age_col: pd.Series) -> pd.Series:
 
 
 # --- Periodization of the "Great Rewiring" -----------------------------------
-# Haidt y Twenge ubican la "Gran Reconexión" entre 2010 y 2015. Construimos una
-# etiqueta de período para segmentar el análisis.
+# Haidt (2024, ch.1) and Twenge (2017) date the Great Rewiring to 2010-2015:
+# the period in which the smartphone became ubiquitous among teens and play-
+# based childhood was replaced by phone-based childhood.
+# We segment the analysis into 4 mutually exclusive periods, with the rewiring
+# window INCLUDING 2015 (per Haidt) — this is a fixed boundary, not a year
+# boundary. Bins use right=True so the upper edge is inclusive.
+#
+# Pre-rewiring  (≤2009)  : 5 years of "before"
+# Rewiring      (2010-2015): the Great Rewiring itself
+# Post-rewiring  (2016-2019): 4 years of "after", pre-COVID
+# Pandemic-era  (≥2020)  : COVID叠加 and beyond
 
-PERIOD_BINS = [-np.inf, 2009, 2014, 2019, np.inf]
-PERIOD_LABELS = ["pre-rewiring (≤2009)", "rewiring (2010-2014)", "post-rewiring (2015-2019)", "pandemic-era (≥2020)"]
+from wired_apart import config
+
+PERIOD_BINS = [
+    -np.inf,
+    config.REWIRING_START_YEAR - 1,   # 2009
+    config.REWIRING_END_YEAR,         # 2015
+    2019,
+    np.inf,
+]
+PERIOD_LABELS = [
+    "pre-rewiring (≤2009)",
+    "rewiring (2010-2015)",
+    "post-rewiring (2016-2019)",
+    "pandemic-era (≥2020)",
+]
 
 
 def assign_rewiring_period(year_col: pd.Series) -> pd.Series:
-    """Etiqueta cada observación según el período de la Gran Reconexión."""
+    """Etiqueta cada observación según el período de la Gran Reconexión.
+
+    La ventana "rewiring" sigue a Haidt (2024) e incluye 2015.
+    """
     return pd.cut(year_col, bins=PERIOD_BINS, labels=PERIOD_LABELS, right=True)
 
 

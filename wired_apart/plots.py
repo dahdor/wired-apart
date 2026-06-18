@@ -38,9 +38,16 @@ def save(fig, name: str, fmt: str | None = None) -> Path:
     return out
 
 
-def highlight_period(ax, start: int = 2010, end: int = 2015, label: str = "Great Rewiring",
+def highlight_period(ax, start: int | None = None, end: int | None = None,
+                    label: str = "Great Rewiring",
                     color: str | None = None, alpha: float = 0.15) -> None:
-    """Sombrea la ventana 2010-2015 en un eje de tiempo para anclar la narrativa."""
+    """Sombrea la ventana del Great Rewiring (2010-2015) en un eje de tiempo.
+
+    Los defaults se leen de `config.REWIRING_START_YEAR` y `REWIRING_END_YEAR`
+    para que la narrativa sea consistente entre todas las figuras.
+    """
+    start = start if start is not None else config.REWIRING_START_YEAR
+    end = end if end is not None else config.REWIRING_END_YEAR
     color = color or config.COLOR_PALETTE["secondary"]
     ax.axvspan(start, end, alpha=alpha, color=color,
                label=label, zorder=0)

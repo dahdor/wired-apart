@@ -276,14 +276,42 @@ git add -A && git commit -m "..." && git push
 
 ## 14. TL;DR ejecutivo
 
-**Estado final del proyecto (junio 2026):**
+**Estado final del proyecto (junio 2026, post-revisión):**
 - **Repo público:** https://github.com/dahdor/wired-apart
-- **16 commits** limpios, pusheados
+- **17 commits** limpios, pusheados
 - **8 notebooks** del pipeline (0.0 → 5.0) ejecutados
 - **14 figuras** narradas en `reports/figures/`
-- **Informe técnico:** `reports/informe.html` (5.5 MB) y `reports/informe.pdf` (24 páginas)
+- **Informe técnico:** `reports/informe.html` (5.7 MB) y `reports/informe.pdf` (24 páginas)
 - **README** con hallazgos reales y framework
 - **handoff.md** con contexto vivo
+
+## 15. Revisión de rigor metodológico (junio 2026)
+
+Diego pidió una revisión completa del repo antes de la entrega. **15 problemas encontrados y corregidos:**
+
+### Bugs críticos corregidos (afectaban análisis)
+
+1. **BUG `notebook 1.0` cell 42**: `q5` (altura en metros, 1.27-2.11) mapeado a `race` → ahora usa `raceeth` (columna CDC, 8 cats).
+2. **BUG `q4` (Hispanic) inconsistente por año**: en 2005 tiene 8 categorías, en 2007+ es binario. **El Simpson analysis del notebook 3.0 estaba inválido para 2007+** porque trataba los 8 cats como uniformes. Re-ejecutado con `hispanic_yesno` (binario unificado) y `race` (8 cats CDC).
+3. **BUG `features.py:PERIOD_BINS`**: ventana rewiring decía "2010-2014" (off-by-one). Ahora es 2010-2015 según Haidt.
+4. **BUG `config.py:ANALYSIS_END_YEAR = 2020`**: ahora 2021 (consistente con YRBS clean y Socrata 2018-2024).
+5. **BUG `Makefile`**: target `pipeline` apuntaba a notebooks renombrados (mtf/nsduh) que no existen. Ahora apunta a yrbs/wonder y usa `nbconvert --execute --inplace` (no `jupyter execute` que no guarda outputs).
+
+### Inconsistencias en informe corregidas
+
+6. **Informe citaba cifras incorrectas del YRBS** (28.6%, 41.5%, 36.4%, 55.6%, 16.3pp, 27.6pp). Las cifras reales tras re-ejecutar con cleaning arreglado: **28.5%, 42.3%, 36.7%, 56.6%, 16.4pp, 28.0pp**. Las tendencias y el OR se mantienen; las cifras absolutas difieren ~1pp.
+7. **Mortalidad "7.5/100k"** en el informe es agregada (ambos sexos, NCHS DB 471). Aclarado explícitamente en el informe. Las cifras de mortalidad desagregadas (HUS 2010 Male 15-19 = 11.7, etc.) están en su propio párrafo.
+
+### Documentación corregida
+
+8. **`pyproject.toml`**: descripción 2005-2020 → 2021; quitadas dependencias obsoletas (pyreadstat, plotly); agregada `pyodbc` (faltaba).
+9. **`README.md`**: subtítulo 2005-2020 → 2021; árbol de archivos lista MTF/NSDUH que no existen (ahora yrbs/wonder); quitada cita a data dictionaries inexistentes.
+10. **`yrbs_data_dictionary.md`**: reescrito. Q4/Q5/Q80/Q25-28 con definiciones correctas y crosswalk validado.
+11. **`data_provenance.md`**: reescrito con crosswalk de Q-codes y aclaración de Q80 (solo 2019).
+12. **`references.bib`**: quitadas refs obsoletas (MTF, NSDUH, SAMHSA), agregadas refs reales (NCHS DB 471, HUS 2018, Socrata, Lee 2022 ROI).
+13. **`dataset.py`**: agregado `load_yrbs_clean()` y `load_wonder_socrata_only()`; docstring de `load_yrbs_processed` clarificado; `load_wonder_processed` ahora apunta al archivo correcto (`wonder_clean_2005_2024.csv`).
+14. **`wired_apart/dataset.py`**: añadido `REPORT_YEAR` constante.
+15. **`informe.qmd`**: reescrito el Simpson analysis con la tabla correcta de 16 subgrupos (sexo × 8 razas); cifras ponderadas actualizadas; limitaciones honestas explícitas sobre el bug corregido.
 
 **Historia del proyecto:** El aumento de sad/hopeless en mujeres adolescentes de 36% (2005) a 56% (2021) coincide con la "phone-based childhood" teorizada por Haidt. El gap de género se amplió de 16pp a 27.6pp, consistente con la hipótesis del libro de que las plataformas image-based (Instagram, TikTok) afectan desproporcionadamente a las mujeres.
 
