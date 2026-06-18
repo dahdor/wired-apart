@@ -1,29 +1,38 @@
 /* styles.css — Custom CSS for the Wired Apart report
- * Forces serif font across all elements (Bootstrap default uses sans-serif for headings).
+ * Forces serif font across ALL elements (headings + body text + nav + code).
  * Diego prefers the serif font (Georgia/Times) — it matches the academic register.
+ * Bootstrap default uses sans-serif for everything; we override with !important.
  */
+
+html, body {
+  font-family: Georgia, "Times New Roman", serif !important;
+  --bs-body-font-family: Georgia, "Times New Roman", serif !important;
+}
+
+p, li, td, th, dt, dd, blockquote,
+figcaption, .caption, .figure-caption,
+input, textarea, select, button,
+label, .form-control, .form-label {
+  font-family: Georgia, "Times New Roman", serif !important;
+}
 
 h1, h2, h3, h4, h5, h6,
 .title, .subtitle, .author, .date,
 .quarto-title, .quarto-title-block,
 nav.toc, .sidebar-navigation,
-.navbar, .nav-link, .navbar-brand,
-code, pre, .sourceCode {
+.navbar, .nav-link, .navbar-brand {
   font-family: Georgia, "Times New Roman", serif !important;
-}
-
-/* Bootstrap default: headings sans-serif, body serif.
- * We force headings to serif too. */
-h1, h2, h3, h4, h5, h6 {
   font-weight: bold;
 }
 
-/* TOC links and other Quarto elements */
-#TOC, .toc-actions, .panel-grid, .panel-sidebar {
+/* TOC and other Quarto elements */
+#TOC, .toc-actions, .panel-grid, .panel-sidebar,
+.sidebar-title, .toc-title {
   font-family: Georgia, "Times New Roman", serif !important;
 }
 
-/* Make sure code blocks stay monospace (readability) */
-pre, code, .sourceCode, .code-with-filename {
+/* Code blocks stay monospace for readability */
+pre, code, .sourceCode, .code-with-filename,
+kbd, samp {
   font-family: "Courier New", monospace !important;
 }
