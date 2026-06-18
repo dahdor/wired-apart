@@ -28,14 +28,19 @@ def apply_project_style() -> None:
 
 def save(fig, name: str, fmt: str | None = None) -> Path:
     """Guarda una figura en `reports/figures/` con el formato configurado."""
-    fmt = fmt or config.FIGURE_FORMAT
-    out = config.FIGURES_DIR / f"{name}.{fmt}"
+    if isinstance(name, Path):
+        out = name
+    else:
+        fmt = fmt or config.FIGURE_FORMAT
+        out = config.FIGURES_DIR / f"{name}.{fmt}"
     out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out, format=fmt)
     return out
 
 
-def highlight_period(ax, start: int = 2010, end: int = 2015, label: str = "Great Rewiring") -> None:
+def highlight_period(ax, start: int = 2010, end: int = 2015, label: str = "Great Rewiring",
+                    color: str | None = None, alpha: float = 0.15) -> None:
     """Sombrea la ventana 2010-2015 en un eje de tiempo para anclar la narrativa."""
-    ax.axvspan(start, end, alpha=0.15, color=config.COLOR_PALETTE["secondary"],
+    color = color or config.COLOR_PALETTE["secondary"]
+    ax.axvspan(start, end, alpha=alpha, color=color,
                label=label, zorder=0)
