@@ -129,7 +129,7 @@ plataformas no-Windows.
 usa para regenerar el stacked raw desde los `.mdb` originales (notebook
 0.0), pero ese output ya está commiteado.
 
-Si preferís no usar `make`, los mismos comandos funcionan con `uv` directamente:
+Si prefieres no usar `make`, los mismos comandos funcionan con `uv` directamente:
 
 ```bash
 # 1. Clonar
@@ -187,7 +187,7 @@ El proyecto está diseñado para que un clon fresco pueda regenerar **todos** lo
 git clone https://github.com/dahdor/wired-apart.git
 cd wired-apart
 make install      # uv sync --all-extras + quarto install tinytex
-make validate     # pipeline + report + tests (skip-download si ya tenés los datos)
+make validate     # pipeline + report + tests (skip-download si ya tienes los datos)
 ```
 
 ### Componentes de reproducibilidad

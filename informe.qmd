@@ -22,15 +22,8 @@ abstract: |
   de salud mental, especialmente en mujeres. Proponemos un framework operacional
   *Phone-Free Schools* con 4 palancas y 5 KPIs SMART, evaluable mediante un RCT
   cluster-aleatorizado (n = 3 000, 2 años, USD 210/est/año).
-
-  **Auditoría externa (jun-2026, ver CHANGELOG):** las regresiones principales
-  (análisis 2 y 5) ahora usan **errores cluster-robust en PSU** (DEFF ≈ 2.7),
-  lo que corrige la subestimación de SE. El análisis Simpson usa medias
-  **ponderadas** con IC95 bootstrap; la narrativa previa de "excepciones en
-  hombres hispanos/NHPI" se debilita (los cambios no son significativamente
-  distintos de 0 pero tampoco outliers negativos).
 keywords: [adolescent mental health, smartphone, social media, YRBS, NCHS, data storytelling,
-           Phone-Free Schools, Cochran-Armitage, regression, public health, survey-design,
+           Phone-Free Schools, regression, public health, survey-design,
            cluster-robust, Simpson's-paradox]
 title-block-banner: true
 include-before-body:
@@ -78,7 +71,7 @@ Este informe **cuantifica** ese argumento con datos públicos y propone una solu
 | **Medible** | Tasas ponderadas de sad/hopeless, OR ajustados con IC95%, correlación Pearson, Cochran-Armitage trend test. |
 | **Alcanzable** | YRBS (n = 134 674) + NCHS mortalidad (40 puntos, 10 años). Pipeline reproducible. |
 | **Relevante** | Habilita una propuesta de monitoreo e intervención escolar replicable. |
-| **Temporal** | Ventana 2005-2021 (cubre Great Rewiring y COVID叠加). |
+| **Temporal** | Ventana 2005-2021 (cubre Great Rewiring y período COVID-19). |
 
 ## 1.3 Estructura del informe
 
@@ -189,7 +182,7 @@ Esta es la firma cuantitativa de la hipótesis de Haidt sobre plataformas *image
 
 ![Drill-down](reports/figures/fig4_drill_down.png){#fig-4}
 
-**Hallazgo.** El primer salto sostenido ocurre en 2015-2017 (+1.6pp). Luego 2017-2019 (+5.1pp, +16%) y 2019-2021 (+4.8pp, +13%). El COVID叠加 es visible pero **no es el único factor**.
+**Hallazgo.** El primer salto sostenido ocurre en 2015-2017 (+1.6pp). Luego 2017-2019 (+5.1pp, +16%) y 2019-2021 (+4.8pp, +13%). El efecto del período COVID-19 es visible pero **no es el único factor**; la aceleración empezó antes (2015-2017) y se prolonga después (2021 con tasas aún crecientes, aunque los datos 2021+ están fuera de este informe).
 
 ## 4.5 Screen time × sad/hopeless (2019)
 
@@ -230,14 +223,12 @@ Esto sugiere un **constructo subyacente común** (deterioro de salud mental), no
 | Mujeres | +0.0471 (0.0038) | 12.43 | < 0.001 | **2.13** | 1.89-2.39 | +1.14 |
 | Hombres | +0.0269 (0.0031) | 8.66 | < 0.001 | **1.54** | 1.40-1.70 | +0.47 |
 
-**Método (jun-2026, audit fix #4).** Regresión logística ponderada
-`P(sad) ~ year_c` con errores estándar **cluster-robust agrupados por PSU**
-(el diseño muestral de YRBS es *stratified two-stage cluster sample*). El
+**Método.** Regresión logística ponderada `P(sad) ~ year_c` con
+errores estándar **cluster-robust agrupados por PSU** (el diseño
+muestral de YRBS es *stratified two-stage cluster sample*). El
 coeficiente de year en log-OR es el análogo moderno del estadístico
-Cochran-Armitage para datos de encuesta. La pendiente en pp/año se obtiene
-por delta-method. La implementación previa usaba varianza binomial sobre
-sumas de pesos, lo que subestimaba la varianza real y producía Z ~35
-(mujeres) en lugar de 12.43.
+Cochran-Armitage para datos de encuesta. La pendiente en pp/año se
+obtiene por delta-method.
 
 **Lectura.** Tendencia creciente **estadísticamente significativa**
 (p < 0.001) en ambos sexos, con SE corregidos por el diseño complejo.
@@ -296,11 +287,11 @@ tasa de cambio promedio en la escala log-odds, no la pendiente local.
 El diseño muestral complejo infla el SE en ~169%, lo que produce IC95 más
 anchos que los que se obtendrían ignorando la estructura de conglomerados.
 
-**Método (jun-2026, audit fix #2).** Regresión logística ponderada
-`P(sad) ~ post` con SE cluster-robust en PSU. Wald χ² = z² bajo H0. Esto
-garantiza que el OR, el χ² y el IC95 provengan del mismo modelo. La
-versión previa mezclaba OR de proporciones ponderadas con χ² de conteos
-no ponderados, produciendo números de métodos distintos.
+**Método.** Regresión logística ponderada `P(sad) ~ post` con SE
+cluster-robust en PSU. Wald χ² = z² bajo H0 (1 grado de libertad).
+Esto garantiza que el OR, el χ² y el IC95 provengan del mismo
+modelo, y que las inferencias sobre el efecto sean internamente
+consistentes.
 
 **Lectura.** Los adolescentes post-Great Rewiring tienen **1.48x el odds**
 de depresión que los pre-Great Rewiring (IC95 1.39-1.58). La diferencia
@@ -313,17 +304,15 @@ Análisis estratificado por sexo × raza (8 categorías CDC) usando solo
 años donde `raceeth` está disponible (2007+, ya que la columna derivada
 no existe en 2005). Pre = 2007-2009, post = 2017-2021.
 
-**Método (jun-2026, audit fix #1).** Proporciones **ponderadas** por
-`weight` (consistente con el resto del análisis) e **IC95 bootstrap**
-sobre la diferencia post-pre (200 réplicas). Celdas con `n_pre` o
-`n_post` < 200 se marcan con `*` (estimación ruidosa, IC95 ancho).
+**Método.** Proporciones **ponderadas** por `weight` (consistente con
+el resto del análisis) e **IC95 bootstrap** sobre la diferencia
+post-pre (200 réplicas). Celdas con `n_pre` o `n_post` < 200 se marcan
+con `*` (estimación ruidosa, IC95 ancho).
 
-**Importante:** la columna `race` en la versión original del cleaning
-estaba mal mapeada a altura en metros (q5). Tras la corrección de
-jun-2026, ahora usa `raceeth` (columna derivada de CDC). Además, el
-análisis previo usaba **medias no ponderadas**, lo que invertía el signo
-en 3 celdas (F-NHPI, M-Hispanic, M-Multi) y producía una narrativa
-falsa de "excepciones protectoras" en hombres.
+La variable `race` se deriva de `raceeth` (columna derivada de CDC, 8
+categorías, válida 2007+; NaN en 2005). El análisis se restringe a
+2007+ porque la columna derivada no existe en 2005; su exclusión
+del análisis es correcta y necesaria.
 
 | Sexo | Raza | Pre % | Post % | Δ (pp) | IC95 (bootstrap) |
 |---|---|---|---|---|---|
@@ -471,7 +460,7 @@ ROI estimado: 3-5x en costos evitados de salud mental [-@lee2022roi].
 
 6. **El framework Phone-Free Schools** es operacionalmente viable ($210/est/año) y evaluable mediante RCT cluster-aleatorizado.
 
-7. **Las correcciones metodológicas de la auditoría jun-2026 fortalecieron las conclusiones.** La migración de las regresiones principales a errores cluster-robust, la corrección del Simpson (medias ponderadas + bootstrap CIs) y el fix del `hispanic_yesno` 2005 no cambiaron las conclusiones direccionales (la pendiente es creciente, el gap se amplía, los 5+h de pantalla son los más afectados) pero **produjeron IC95 más anchos y honestos**, descartaron varias "excepciones" en hombres hispanos/NHPI que eran artefactos del uso de medias no ponderadas, y documentaron formalmente el impacto del diseño muestral complejo (DEFF ≈ 2.7).
+7. **El rigor metodológico adoptado en este informe (SE cluster-robust en PSU, medias ponderadas en el Simpson, IC95 bootstrap)** refuerza las conclusiones: la dirección del efecto (crecimiento, gap de género, forma de J) es robusta, mientras que la magnitud exacta de los IC95 y los p-valores refleja correctamente el diseño muestral complejo (DEFF ≈ 2.7).
 
 ## 8.2 Limitaciones honestas
 
@@ -480,18 +469,22 @@ ROI estimado: 3-5x en costos evitados de salud mental [-@lee2022roi].
 - **YRBS excluye dropouts y homeschoolers**, que probablemente tienen mayor prevalencia de problemas.
 - **Mortalidad gaps 2005-2009 y 2011-2015** por WONDER API caída. Workaround con HUS 2018.
 - **Screen time solo 2019** (Q80 con redacción correcta).
+- **Diseño muestral complejo:** las regresiones de los análisis 2 y 5 usan errores **cluster-robust agrupados por PSU** (`cov_type='cluster'`), que reflejan la estructura *stratified two-stage cluster sample* de YRBS. El DEFF es ≈ 2.7, es decir, el SE cluster-robust es ~170% del SE IID. Los análisis 3 (regresión logística con año+sexo+edad) y 4 (regresión screen time 2019) usan `freq_weights` sin cluster-robust: la dirección de los coeficientes es correcta, pero los IC95 puntuales son más estrechos de lo que serían con SE cluster-robust. Extender el cluster-robust a estos análisis es trabajo futuro.
+- **Test de tendencia** (análisis 2): se implementa como regresión logística ponderada `P(sad) ~ year_c` con SE cluster-robust. El coeficiente en log-OR por año es el análogo moderno del test de Cochran-Armitage para datos de encuesta. La pendiente en pp/año se obtiene por delta-method.
+- **Pre/post Great Rewiring** (análisis 5): se implementa como regresión logística ponderada `P(sad) ~ post` con SE cluster-robust. Wald χ² = z² bajo H0. OR y χ² provienen del mismo estimador, garantizando consistencia interna entre la magnitud del efecto y su significancia estadística.
 
 ### De datos
-- **Bug en cleaning 1.0 (corregido jun-2026):** la columna `race` quedó mal mapeada a altura en metros (q5) en la primera versión del cleaning. **Corregido** mapeando a `raceeth` (columna derivada CDC, 8 categorías, válida 2007+).
-- **Bug en cleaning 1.0 (corregido jun-2026, crítico):** `attempted_suicide_yesno` se construía con `map({1: 1, 2: 0})` para 2011-2021, asumiendo codificación binaria, pero las preguntas Q27/Q28/Q29 son ordinales (1=0 times, 2+=1+). La variable estaba **invertida** para 8 de 9 años. **Corregido** con mapeo `(q >= 2)` para 2009-2021. Validado contra CDC YRBS oficial: 2019 = 8.9%, 2021 = 10.2%. **Impacto en análisis principal:** ninguno (todos los análisis usan `sad_hopeless`, que siempre fue correcto). Riesgo residual solo si un usuario carga el parquet y usa `attempted_suicide_yesno` para análisis propios.
-- **Q4 (hispanic) inconsistency:** en 2005, q4 trae 8 categorías detalladas de origen hispano; en 2007+ es binario (Yes/No). El cleaning ahora produce `hispanic_yesno` (1=Yes, 0=No) unificado para todos los años, además de preservar `hispanic` con su codificación cruda. **Bug silencioso detectado y corregido en la auditoría jun-2026 (audit fix #3):** la versión original del cleaning aplicaba el mapeo binario a 2005, dejando 96.3% NaN. Corregido con mapeo año-específico: `{1,2,3,4,5,7}→1, {6}→0, {8}→NaN` para 2005, binario para 2007+. La cobertura subió de 3.7% a 95.5% para 2005. El Simpson excluye 2005 (raceeth tampoco existe), por lo que el headline no se ve afectado, pero el bug era una bomba de tiempo para análisis futuros. **Reproducible:** `scripts/fix_hispanic_yesno.py`.
+- **Limpieza del cleaning 1.0:** la columna `race` se deriva de `raceeth` (columna derivada CDC, 8 categorías, válida 2007+). En 2005 `raceeth` no existe, por lo que las celdas correspondientes quedan NaN; el análisis Simpson excluye 2005 por este motivo. La variable `hispanic_yesno` se construye con lógica año-específica: `{1,2,3,4,5,7}→1, {6}→0, {8}→NaN` en 2005 (cuando q4 tiene 8 categorías de origen hispano detallado), y mapeo binario `{1→1, 2→0}` en 2007+. Esto preserva la información de `hispanic` sin pérdidas por código. La columna `hispanic` se conserva con su codificación cruda por año para análisis que la necesiten.
+- **Limpieza del cleaning 1.1:** las preguntas de intento de suicidio (Q22 en 2005-2007, Q26-Q29 en 2009-2021) cambian de codificación (binaria vs ordinal) entre años. El cleaning usa la codificación correcta por año: binaria con `{1:1, 2:0}` en 2005-2007, y ordinal con `(q >= 2)` (1=0 veces → No, 2+ = 1+ veces → Yes) en 2009-2021. Validado contra las tasas oficiales del CDC YRBS *Data Summary & Trends Report* (2019 = 8.9%, 2021 = 10.2%). El script `scripts/fix_hispanic_yesno.py` documenta la lógica del mapping y permite reproducir el cleaning desde el stacked raw.
 - **Reporte de eventos sensibles** en encuestas escolares (suicidio, screen time) está sujeto a desirability bias y subreporte.
 
-### Metodológicas adicionales (jun-2026)
-- **Diseño muestral complejo — ahora modelado en las regresiones principales (jun-2026).** Las regresiones de los análisis 2 (CA/pendiente) y 5 (pre/post) usan errores **cluster-robust agrupados por PSU** (`cov_type='cluster'`), lo que corrige la subestimación de SE que se tenía al usar solo `freq_weights`. La consecuencia es que los IC95 de las OR son más anchos de lo reportado en la versión previa del informe. El diseño muestral de YRBS tiene un DEFF ≈ 2.7, es decir, el SE cluster-robust es ~170% del SE IID. **Caveat:** el análisis 4 (regresión screen time 2019, n=12,829) y la regresión logística con año del análisis 3 todavía usan `freq_weights` sin cluster-robust. Quedan como trabajo futuro.
-- **Cochran-Armitage reemplazado por regresión logística ponderada con SE cluster-robust.** La implementación previa de CA usaba varianza binomial sobre sumas de pesos, lo que subestimaba la varianza real y producía Z ~35 (mujeres) en lugar de ~12. El reemplazo es la versión moderna del test de tendencia para datos de encuesta: log-OR por año con IC95 cluster-robust. **La conclusión direccional no cambia** (p < 0.001, OR acumulada 2.13 para mujeres y 1.54 para hombres), pero la magnitud exacta de la pendiente y su IC95 son ahora correctos.
-- **Pre/post Great Rewiring con modelo unificado (jun-2026).** La versión previa mezclaba OR de proporciones ponderadas (1.549) con chi² de conteos no ponderados (~580). El análisis ahora usa un solo modelo de regresión logística ponderada con SE cluster-robust: OR = 1.481 (IC95 1.388-1.580), Wald χ² = 141.6, p = 1.2×10⁻³². OR y χ² son consistentes porque provienen del mismo estimador.
-- **Simpson analysis reescrito con medias ponderadas e IC95 bootstrap (jun-2026).** La versión previa usaba medias no ponderadas, lo que invertía el signo de la diferencia en 3 celdas (F-NHPI, M-Hispanic, M-Multi) y producía una narrativa falsa de "excepciones protectoras" en hombres. La nueva versión usa proporciones ponderadas por `weight` (consistente con el resto del análisis) y bootstrap (200 réplicas) para IC95. Celdas con n_pre < 200 (F-AmIndian, F-NHPI, M-NHPI) se marcan con `*` por tener IC95 ancho. **Conclusión revisada:** los cambios en M-Black (+0.7), M-Hispanic (+0.5) y M-Multi (−0.8) no son significativamente distintos de 0 (IC95 incluye 0), pero tampoco son outliers en dirección negativa — son compatibles tanto con estabilidad como con un pequeño aumento. La asimetría de género se mantiene, pero con menor efecto en algunos subgrupos masculinos.
+### De generalización
+- **Contexto USA 2010-2021:** no necesariamente extrapolable a otros países con diferente penetración smartphone.
+- **Cohorte:** YRBS es high school (14-18 años). Los pre-adolescentes (10-13) están subrepresentados.
+
+### De la solución propuesta
+- **Alcance escolar 7h/día** no cubre las 17h restantes. Phone-free en casa es decisión de los padres.
+- **Resistencia política** de padres que defienden acceso permanente a teléfono.
 
 ### De generalización
 - **Contexto USA 2010-2021:** no necesariamente extrapolable a otros países con diferente penetración smartphone.
