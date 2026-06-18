@@ -8,19 +8,30 @@ Uso:
     uv run python scripts/validate_pipeline.py            # todo
     uv run python scripts/validate_pipeline.py --skip-download  # si los datos ya están
     uv run python scripts/validate_pipeline.py --skip-render    # solo pipeline, sin report
+    uv run python scripts/validate_pipeline.py --skip-pdf       # solo HTML, saltea PDF + TinyTeX
+    uv run python scripts/validate_pipeline.py --install-tinytex  # fuerza TinyTeX aunque haya LaTeX
     uv run python scripts/validate_pipeline.py --quick         # solo tests + verificación outputs
 
 Exit code 0 = todo OK, 1 = algún paso falló.
+
+Notas sobre LaTeX (PDF):
+- Si el sistema tiene lualatex/xelatex/pdflatex (MiKTeX en Windows, TeX
+  Live en Linux), el script lo detecta y NO descarga TinyTeX. Es la ruta
+  rápida: 0-1 min extra para el PDF.
+- Si no hay motor LaTeX, se instala TinyTeX (~1 GB, 10-30 min). La
+  instalación se muestra con progreso (no usamos --quiet).
+- Con --skip-pdf, ni se detecta ni se instala nada de LaTeX.
 """
+
 from __future__ import annotations
 
 import argparse
 import os
+from pathlib import Path
 import platform
 import shutil
 import subprocess
 import sys
-from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -45,6 +56,28 @@ def _py() -> str:
     if shutil.which("uv"):
         return "uv"
     return sys.executable
+
+
+# Orden de preferencia de motores LaTeX. Quarto los auto-detecta; nosotros
+# solo necesitamos saber si hay ALGUNO disponible para saltarnos la
+# descarga de TinyTeX (varios GB). `lualatex` primero porque es el engine
+# por defecto en Quarto >= 1.4 y el que usa el script cuando se invoca
+# en laptops con MiKTeX/Tex Live preinstalado.
+LATEX_ENGINE_PREFERENCE = ("lualatex", "xelatex", "pdflatex")
+
+
+def find_latex_engine() -> str | None:
+    """Devuelve el primer motor LaTeX disponible en PATH, o None.
+
+    Se usa para decidir si hace falta instalar TinyTeX: si el sistema ya
+    tiene un motor LaTeX (MiKTeX en Windows, TeX Live en Linux/macOS),
+    Quarto lo usará directamente y no necesitamos la descarga de
+    varios GB de TinyTeX.
+    """
+    for engine in LATEX_ENGINE_PREFERENCE:
+        if shutil.which(engine) is not None:
+            return engine
+    return None
 
 
 def step(name: str, cmd: list[str], *, cwd: Path | None = None) -> bool:
@@ -92,12 +125,30 @@ def check_outputs() -> list[str]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Validación end-to-end.")
-    parser.add_argument("--skip-download", action="store_true",
-                        help="Saltar descarga de datos crudos.")
-    parser.add_argument("--skip-render", action="store_true",
-                        help="Saltar renderizado del informe Quarto.")
-    parser.add_argument("--quick", action="store_true",
-                        help="Solo correr tests + verificar outputs.")
+    parser.add_argument(
+        "--skip-download", action="store_true", help="Saltar descarga de datos crudos."
+    )
+    parser.add_argument(
+        "--skip-render", action="store_true", help="Saltar renderizado del informe Quarto."
+    )
+    parser.add_argument(
+        "--skip-pdf",
+        action="store_true",
+        help="Saltar SOLO el render PDF (HTML sí se genera). "
+        "Implica saltarse la instalación de TinyTeX. "
+        "Útil cuando no hay LaTeX en el sistema o no se "
+        "quiere esperar la descarga (~1 GB).",
+    )
+    parser.add_argument(
+        "--install-tinytex",
+        action="store_true",
+        help="Fuerza la instalación de TinyTeX aunque haya "
+        "un motor LaTeX en el sistema. Útil para CI "
+        "donde se quiere pinchar la versión de LaTeX.",
+    )
+    parser.add_argument(
+        "--quick", action="store_true", help="Solo correr tests + verificar outputs."
+    )
     args = parser.parse_args(argv)
 
     if args.quick:
@@ -125,8 +176,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if not args.skip_download:
         steps_ok.append(step("download_data", py_prefix + ["scripts/download_data.py"]))
-    steps_ok.append(step("pytest (validación inicial)",
-                          py_prefix + ["pytest", "tests/", "-v"]))
+    steps_ok.append(step("pytest (validación inicial)", py_prefix + ["pytest", "tests/", "-v"]))
     # Notebooks en orden, saltando los platform-specific en Linux.
     is_windows = platform.system() == "Windows"
     notebooks = [
@@ -143,17 +193,18 @@ def main(argv: list[str] | None = None) -> int:
         nb_name = Path(path).name
         if not is_windows and nb_name in SKIP_NOTEBOOKS_ON_LINUX:
             print(f"\n=== Saltando notebook {label} ({nb_name}) en {platform.system()} ===")
-            print(f"  Razón: requiere Microsoft Access ODBC driver (Windows-only).")
-            print(f"  El output (data/processed/yrbs_2005_2021.parquet) ya está commiteado.")
+            print("  Razón: requiere Microsoft Access ODBC driver (Windows-only).")
+            print("  El output (data/processed/yrbs_2005_2021.parquet) ya está commiteado.")
             continue
-        steps_ok.append(step(
-            f"notebook {label} ({Path(path).stem})",
-            py_prefix + ["jupyter", "nbconvert", "--to", "notebook",
-                          "--execute", "--inplace", path],
-        ))
+        steps_ok.append(
+            step(
+                f"notebook {label} ({Path(path).stem})",
+                py_prefix
+                + ["jupyter", "nbconvert", "--to", "notebook", "--execute", "--inplace", path],
+            )
+        )
     # Re-correr tests después del pipeline (detecta drift)
-    steps_ok.append(step("pytest (post-pipeline)",
-                          py_prefix + ["pytest", "tests/", "-v"]))
+    steps_ok.append(step("pytest (post-pipeline)", py_prefix + ["pytest", "tests/", "-v"]))
     if not args.skip_render:
         # Asegurar que quarto está en el PATH; sin esto, subprocess.call()
         # no lo encuentra aunque esté en ~/.local/quarto/bin.
@@ -169,18 +220,63 @@ def main(argv: list[str] | None = None) -> int:
                     "         y re-ejecuta 'make install' (que también instala TinyTeX).",
                     file=sys.stderr,
                 )
-        # TinyTeX (LaTeX) es necesario para el PDF. quarto's install tinytex
-        # es idempotente: si ya está, no hace nada.
+        # Decidir motor LaTeX para el PDF. Si el sistema ya tiene uno
+        # (MiKTeX en Windows, TeX Live en Linux/macOS) NO instalamos
+        # TinyTeX — su distribución son varios GB y la descarga puede
+        # tardar 10-30 min incluso con buena conexión, sin progreso
+        # visible porque quarto install tinytex --quiet silencia la
+        # salida. Solo instalamos TinyTeX si (a) no hay motor en sistema
+        # Y (b) el usuario no pasó --skip-pdf.
         if shutil.which("quarto") is not None:
-            print("\n=== TinyTeX check (necesario para PDF) ===")
-            steps_ok.append(step("quarto install tinytex",
-                                 ["quarto", "install", "tinytex", "--quiet"]))
-        steps_ok.append(step("quarto render html",
-                              ["quarto", "render", "informe.qmd", "--to", "html",
-                               "--output-dir", "reports", "--no-cache"]))
-        steps_ok.append(step("quarto render pdf",
-                              ["quarto", "render", "informe.qmd", "--to", "pdf",
-                               "--output-dir", "reports", "--no-cache"]))
+            latex_engine = find_latex_engine()
+            if args.skip_pdf:
+                print("\n=== PDF render SKIPPED (--skip-pdf) ===")
+                print("  No se instala TinyTeX; solo se genera el HTML.")
+            elif latex_engine is not None and not args.install_tinytex:
+                print(f"\n=== LaTeX: usando {latex_engine} del sistema ===")
+                print("  TinyTeX NO se instala (ahorramos ~1 GB de descarga).")
+                print("  Para forzar TinyTeX, usá --install-tinytex.")
+            else:
+                if latex_engine is None:
+                    print("\n=== LaTeX: no se detectó motor en sistema ===")
+                    print("  Motores buscados: " + ", ".join(LATEX_ENGINE_PREFERENCE))
+                    print("  Se instalará TinyTeX (puede tardar varios minutos).")
+                else:
+                    print("\n=== LaTeX: forzando TinyTeX (--install-tinytex) ===")
+                    print(f"  Motor del sistema ignorado: {latex_engine}")
+                # Sin --quiet: el usuario debe ver el progreso de descarga.
+                steps_ok.append(step("quarto install tinytex", ["quarto", "install", "tinytex"]))
+        steps_ok.append(
+            step(
+                "quarto render html",
+                [
+                    "quarto",
+                    "render",
+                    "informe.qmd",
+                    "--to",
+                    "html",
+                    "--output-dir",
+                    "reports",
+                    "--no-cache",
+                ],
+            )
+        )
+        if not args.skip_pdf:
+            steps_ok.append(
+                step(
+                    "quarto render pdf",
+                    [
+                        "quarto",
+                        "render",
+                        "informe.qmd",
+                        "--to",
+                        "pdf",
+                        "--output-dir",
+                        "reports",
+                        "--no-cache",
+                    ],
+                )
+            )
     # Verificación final
     issues = check_outputs()
 

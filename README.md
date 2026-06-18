@@ -153,13 +153,36 @@ uv run python scripts/validate_pipeline.py --skip-download
 | Target | Qué hace |
 |---|---|
 | `make install` | `uv sync --all-extras` + `quarto install tinytex` |
-| `make test` | 32 tests pytest (integridad, anti-regresión) |
+| `make test` | 38 tests pytest (integridad, anti-regresión, heatmap) |
 | `make pipeline` | Ejecuta los 8 notebooks en orden (skip 0.0 en Linux/macOS) |
 | `make report` | Renderiza el informe a HTML y PDF |
 | `make validate` | download + pipeline + report + tests + check outputs |
+| `make validate-no-pdf` | Igual a `validate` pero **sin PDF** (HTML sí, TinyTeX no) |
+| `make validate-quick` | Solo tests + verificación de outputs (no re-ejecuta) |
 | `make download` | Descarga YRBS .mdb + NCHS Socrata (idempotente, skip ODBC en Linux) |
 | `make clean` | Borra pyc, __pycache__, .ipynb_checkpoints |
 | `make lint` / `format` | ruff check / auto-format |
+
+`make validate` acepta `EXTRA="..."` para pasar flags al script subyacente:
+```bash
+make validate EXTRA="--skip-pdf"          # HTML only, no TinyTeX
+make validate EXTRA="--install-tinytex"   # fuerza TinyTeX (pese a tener MiKTeX/TeX Live)
+```
+
+### Sobre el render PDF y LaTeX
+
+El informe en PDF requiere un motor LaTeX. El script detecta automáticamente
+si el sistema tiene uno disponible y solo descarga TinyTeX si es necesario:
+
+| Sistema | Comportamiento por defecto |
+|---|---|
+| Linux/macOS con TeX Live / MacTeX | Usa el motor del sistema. **No descarga TinyTeX.** |
+| Windows con MiKTeX | Usa el motor del sistema (típicamente `lualatex`). **No descarga TinyTeX.** |
+| Cualquier sistema SIN LaTeX | Instala TinyTeX (~1 GB, varios minutos con progreso visible). |
+| `make validate-no-pdf` o `EXTRA="--skip-pdf"` | Saltea PDF y TinyTeX por completo. |
+
+Si querés forzar la instalación de TinyTeX aunque tengas LaTeX (por ejemplo,
+para pinear la versión en CI), usá `make validate EXTRA="--install-tinytex"`.
 
 ### Solo regenerar el informe (sin re-ejecutar notebooks)
 

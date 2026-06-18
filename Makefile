@@ -62,14 +62,22 @@ download-socrata:
 
 ## Validate end-to-end: download → pipeline → report → tests.
 ## Use this for CI and for sanity-checking after big changes.
+## Pass EXTRA="--skip-pdf" to skip PDF rendering + TinyTeX install
+## (useful on machines without LaTeX or to avoid the ~1 GB download).
 .PHONY: validate
 validate:
-	uv run python scripts/validate_pipeline.py
+	uv run python scripts/validate_pipeline.py $(EXTRA)
 
 ## Quick validation: just tests + check outputs exist (skip pipeline).
 .PHONY: validate-quick
 validate-quick:
 	uv run python scripts/validate_pipeline.py --quick
+
+## Validate WITHOUT PDF (HTML only, no TinyTeX install).
+## Use this on machines without LaTeX or when you only need the HTML.
+.PHONY: validate-no-pdf
+validate-no-pdf:
+	uv run python scripts/validate_pipeline.py --skip-pdf
 
 ## Remove compiled Python files (cross-platform: usa Python, no `find`)
 .PHONY: clean
