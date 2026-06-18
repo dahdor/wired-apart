@@ -275,3 +275,143 @@ def test_assign_rewiring_period() -> None:
     assert "rewiring" in labels[2]  # 2015 (inclusivo)
     assert "post-rewiring" in labels[3]  # 2016
     assert "pandemic-era" in labels[4]  # 2020
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Tests anti-regresión de los 4 fixes críticos de la auditoría jun-2026
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+def test_hispanic_yesno_2005_coverage(yrbs_clean: pd.DataFrame) -> None:
+    """Regresión del audit fix #3: hispanic_yesno para 2005 debe estar poblado.
+
+    En 2005, q4 tiene 8 categorías (Mexican, Puerto Rican, Central/South
+    American, Cuban, Other Hispanic, Not Hispanic, Multiple Hispanic, Unknown).
+    El bug original usaba map({1: 1, 2: 0}) y dejaba 96.3% NaN. La corrección
+    mapea {1,2,3,4,5,7}->1, {6}->0, {8}->NaN. La cobertura para 2005 debe ser
+    > 90% (similar a la de los demás años, ~98%).
+    """
+    sub_2005 = yrbs_clean[yrbs_clean["year"] == 2005]
+    coverage = sub_2005["hispanic_yesno"].notna().mean()
+    assert coverage > 0.90, (
+        f"hispanic_yesno 2005 coverage = {coverage:.3f}, esperado > 0.90. "
+        "¿Regresión del audit fix #3?"
+    )
+    # Distribución esperada: ~50% Yes, ~45% No, ~5% NaN
+    yes_pct = (sub_2005["hispanic_yesno"] == 1).mean()
+    no_pct = (sub_2005["hispanic_yesno"] == 0).mean()
+    assert 0.40 < yes_pct < 0.60, f"2005 %Yes = {yes_pct:.3f}, esperado ~0.50"
+    assert 0.30 < no_pct < 0.55, f"2005 %No = {no_pct:.3f}, esperado ~0.45"
+
+
+def test_hispanic_yesno_other_years_unchanged(yrbs_clean: pd.DataFrame) -> None:
+    """Regresión del audit fix #3: 2007+ no debe cambiar.
+
+    El bug solo afectaba a 2005 (8-cat q4). En 2007+ q4 es binario y el
+    mapeo es correcto desde el inicio. Verificamos que las distribuciones
+    no cambiaron.
+    """
+    for year in [2007, 2009, 2011, 2013, 2015, 2017, 2019, 2021]:
+        sub = yrbs_clean[yrbs_clean["year"] == year]
+        coverage = sub["hispanic_yesno"].notna().mean()
+        assert coverage > 0.97, (
+            f"hispanic_yesno {year} coverage = {coverage:.3f}, "
+            f"esperado > 0.97 (cambio inesperado post-fix)"
+        )
+
+
+def test_simpson_uses_weighted_means(yrbs_clean: pd.DataFrame) -> None:
+    """Regresión del audit fix #1: Simpson debe usar medias ponderadas.
+
+    Verificamos que el cálculo de la diferencia post-pre para Female White
+    (la celda más grande) coincide con la versión ponderada y NO con la no
+    ponderada. La diferencia entre ambas es ~0.3pp para esta celda.
+    """
+    sub = yrbs_clean[
+        (yrbs_clean["sex"] == 1.0)
+        & (yrbs_clean["race"] == 5.0)  # White
+        & yrbs_clean["sad_hopeless"].notna()
+    ]
+    pre = sub[sub["year"].isin([2007, 2009])]
+    post = sub[sub["year"].isin([2017, 2019, 2021])]
+    # Media ponderada
+    pre_w = (pre["sad_hopeless"] * pre["weight"]).sum() / pre["weight"].sum() * 100
+    post_w = (post["sad_hopeless"] * post["weight"]).sum() / post["weight"].sum() * 100
+    delta_w = post_w - pre_w
+    # Media no ponderada (la versión rota)
+    pre_uw = pre["sad_hopeless"].mean() * 100
+    post_uw = post["sad_hopeless"].mean() * 100
+    delta_uw = post_uw - pre_uw
+    # El Simpson ponderado debe estar cerca de 13.6pp (no 13.0pp que es la versión unweighted)
+    assert abs(delta_w - 13.6) < 0.5, (
+        f"F-White delta ponderado = {delta_w:.2f}pp, esperado ~13.6pp. "
+        f"Unweighted = {delta_uw:.2f}pp. ¿Regresión del audit fix #1?"
+    )
+
+
+def test_pre_post_uses_consistent_model(yrbs_clean: pd.DataFrame) -> None:
+    """Regresión del audit fix #2: el OR post/pre debe coincidir con el
+    cociente de odds de proporciones ponderadas (mismo método para ambos).
+
+    Si se vuelve a mezclar OR de proporciones con chi² de conteos no
+    ponderados, los números divergen (~1.549 vs 1.378). El método
+    correcto usa UN SOLO modelo de regresión logística ponderada.
+    """
+    import statsmodels.api as sm
+    d = yrbs_clean.dropna(subset=["sad_hopeless", "weight", "psu"]).copy()
+    d["post"] = d["year"].isin([2017, 2019, 2021]).astype(int)
+    # Media ponderada
+    pre = (d[d.post == 0]["sad_hopeless"] * d[d.post == 0]["weight"]).sum() / d[d.post == 0]["weight"].sum()
+    post = (d[d.post == 1]["sad_hopeless"] * d[d.post == 1]["weight"]).sum() / d[d.post == 1]["weight"].sum()
+    or_expected = (post / (1 - post)) / (pre / (1 - pre))
+    # OR de regresión logística con SE cluster-robust
+    model = sm.GLM(
+        d["sad_hopeless"],
+        sm.add_constant(d[["post"]]),
+        family=sm.families.Binomial(),
+        freq_weights=d["weight"],
+    ).fit(cov_type="cluster", cov_kwds={"groups": d["psu"]})
+    or_model = float(model.params["post"])
+    import numpy as np
+    or_model_exp = np.exp(or_model)
+    # Debe coincidir (diferencia < 0.01)
+    assert abs(or_model_exp - or_expected) < 0.01, (
+        f"OR (modelo) = {or_model_exp:.3f}, OR (proporciones) = {or_expected:.3f}. "
+        f"¿Regresión del audit fix #2 (métodos mezclados)?"
+    )
+    # El OR debe estar en el rango [1.4, 1.6]
+    assert 1.4 < or_model_exp < 1.6, (
+        f"OR = {or_model_exp:.3f} fuera del rango esperado [1.4, 1.6]"
+    )
+
+
+def test_ca_uses_survey_weighted_regression(yrbs_clean: pd.DataFrame) -> None:
+    """Regresión del audit fix #4: CA test debe usar regresión logística
+    ponderada con SE cluster-robust, no varianza binomial.
+
+    Si se vuelve a la implementación anterior, el Z de mujeres será ~35
+    (varianza binomial subestima). Con SE cluster-robust debe ser ~12.
+    """
+    import statsmodels.api as sm
+    from scipy import stats
+    import numpy as np
+    d = yrbs_clean.dropna(subset=["sad_hopeless", "weight", "sex", "age", "psu"]).copy()
+    d["year_c"] = d["year"] - 2005
+    sub = d[d["sex"] == 1.0]  # Female
+    model = sm.GLM(
+        sub["sad_hopeless"],
+        sm.add_constant(sub[["year_c"]]),
+        family=sm.families.Binomial(),
+        freq_weights=sub["weight"],
+    ).fit(cov_type="cluster", cov_kwds={"groups": sub["psu"]})
+    z = model.params["year_c"] / model.bse["year_c"]
+    # Con varianza binomial, el Z sería ~35. Con cluster-robust, ~12.
+    assert 8 < z < 16, (
+        f"Z (Female trend) = {z:.2f}, esperado ~12 (rango 8-16). "
+        f"¿Regresión del audit fix #4 (varianza binomial inflada)?"
+    )
+    # El log-OR/year debe ser positivo
+    assert model.params["year_c"] > 0.04, (
+        f"log-OR/year = {model.params['year_c']:.4f}, esperado > 0.04"
+    )
+

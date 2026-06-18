@@ -34,7 +34,7 @@ particularmente útil para análisis de asociación a nivel individual.
 | `q1` | Edad | int | 1=12y, 2=13y, ..., 6=17y, 7=18+y | ✅ correcto | |
 | `q2` | Sexo | int | 1=Female, 2=Male | ✅ correcto | |
 | `q3` | Grado | int | 1=9°, 2=10°, 3=11°, 4=12°, 5=Ungraded/Other | ✅ correcto | |
-| `q4` | **Hispanic/Latino origin** | int (binario) | "1=Yes, 2=No" | ⚠️ Solo 2007+. **2005 tiene 8 categorías** (origen hispano detallado: Mexican, Puerto Rican, etc.) | En `yrbs_clean`: `hispanic` (crudo) y `hispanic_yesno` (unificado 1=Yes, 0=No) |
+| `q4` | **Hispanic/Latino origin** | int (binario) | "1=Yes, 2=No" | ⚠️ Solo 2007+. **2005 tiene 8 categorías** (origen hispano detallado: Mexican, Puerto Rican, etc.) | En `yrbs_clean`: `hispanic` (crudo) y `hispanic_yesno` (unificado 1=Yes, 0=No con lógica año-específica) |
 | `q5` | **HEIGHT (altura)** | float | ❌ Estábamos usando como "race" | ✅ Height in meters (1.27-2.11) | NO es race. Ver `raceeth` abajo. |
 | `q6` | WEIGHT (peso) | float | — | ✅ Weight in kg | |
 | `raceeth` | **Raza-Etnia (derivada CDC)** | string (8 cats) | ❌ NO se usaba | ✅ 1=AI/AN, 2=Asian, 3=Black, 4=NHPI, 5=White, 6=Hispanic, 7=Multi, 8=Unknown | **Solo válida 2007+** (97%). 2005 = NaN. |
@@ -102,7 +102,22 @@ estándar correctos, todos los análisis deben usar `weight` como peso y
   American, Cuban, Other Hispanic, Not Hispanic, Multiple Hispanic, Unknown).
   En 2007+ se simplificó a binario (Yes/No). En `yrbs_clean`:
   - `hispanic` conserva la codificación cruda (útil para 2005).
-  - `hispanic_yesno` es la versión unificada (1=Yes, 0=No) para 2007+.
+  - `hispanic_yesno` es la versión unificada (1=Yes, 0=No) con **lógica
+    año-específica** (corregida en la auditoría jun-2026, audit fix #3):
+    - 2005:   `{1,2,3,4,5,7}→1` (Yes), `{6}→0` (No), `{8}→NaN` (Unknown)
+    - 2007+:  `{1}→1`, `{2}→0` (binario CDC)
+    
+    **Bug pre-auditoría:** la versión original aplicaba el mapeo binario a
+    todos los años, dejando 96.3% de los registros de 2005 con
+    `hispanic_yesno = NaN`. **Corregido** mapeando específicamente las 8
+    categorías de 2005; la cobertura subió de 3.7% a 95.5%. La distribución
+    2005 corregida es ~52% Yes, ~44% No, ~5% NaN (consistente con la
+    demografía adolescente de EE.UU. en esa época).
+    
+    El Simpson excluye 2005 (raceeth tampoco existe), por lo que el bug
+    no afectaba los análisis publicados. Sin embargo, era una bomba de
+    tiempo para análisis futuros sobre 2005. **Reproducible** vía
+    `scripts/fix_hispanic_yesno.py`.
 - **2019 vs otros años:** la pregunta de screen time (Q80) tiene redacción
   diferente (incluye social media + video games) **solo en 2019**.
 

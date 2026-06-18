@@ -12,11 +12,20 @@ QUARTO = quarto
 #################################################################################
 
 ## Install all dependencies (runtime + dev) with uv
+## Also installs TinyTeX (LaTeX distribution needed for PDF report).
+## Quarto must be installed separately; see README "Requirements".
 .PHONY: install
 install:
 	uv sync --all-extras
 	uv run jupytext --sync 'notebooks/*.py' || true
 	uv run python -m ipykernel install --user --name wired-apart --display-name "Python (wired-apart)"
+	@if command -v quarto >/dev/null 2>&1; then \
+		quarto install tinytex --quiet || true; \
+	else \
+		echo "WARNING: 'quarto' not in PATH. Install Quarto >= 1.9 from"; \
+		echo "  https://quarto.org/docs/get-started/ and re-run 'make install'"; \
+		echo "  to install TinyTeX for PDF rendering."; \
+	fi
 
 ## Sync environment (after pulling new deps)
 .PHONY: sync
@@ -27,6 +36,18 @@ sync:
 .PHONY: add
 add:
 	uv add $(PKG)
+
+## Install TinyTeX (LaTeX distribution for PDF report).
+## Idempotent: if already installed, just reports status.
+.PHONY: install-tinytex
+install-tinytex:
+	@if command -v quarto >/dev/null 2>&1; then \
+		quarto install tinytex; \
+	else \
+		echo "ERROR: 'quarto' not in PATH. Install Quarto >= 1.9 first:"; \
+		echo "  https://quarto.org/docs/get-started/"; \
+		exit 1; \
+	fi
 
 ## Download raw data (YRBS .mdb from CDC + NCHS Socrata)
 ## Idempotent: skips files that exist and match expected SHA-256.

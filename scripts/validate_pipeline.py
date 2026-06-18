@@ -15,6 +15,7 @@ Exit code 0 = todo OK, 1 = algún paso falló.
 from __future__ import annotations
 
 import argparse
+import os
 import platform
 import shutil
 import subprocess
@@ -154,6 +155,26 @@ def main(argv: list[str] | None = None) -> int:
     steps_ok.append(step("pytest (post-pipeline)",
                           py_prefix + ["pytest", "tests/", "-v"]))
     if not args.skip_render:
+        # Asegurar que quarto está en el PATH; sin esto, subprocess.call()
+        # no lo encuentra aunque esté en ~/.local/quarto/bin.
+        if shutil.which("quarto") is None:
+            local_quarto = Path.home() / ".local" / "quarto" / "bin"
+            if (local_quarto / "quarto").exists():
+                os.environ["PATH"] = f"{local_quarto}:{os.environ.get('PATH', '')}"
+                print(f"  [info] Añadido {local_quarto} al PATH para esta corrida.")
+            else:
+                print(
+                    "  [WARN] 'quarto' no está en PATH. Instálalo con:\n"
+                    "         https://quarto.org/docs/get-started/\n"
+                    "         y re-ejecuta 'make install' (que también instala TinyTeX).",
+                    file=sys.stderr,
+                )
+        # TinyTeX (LaTeX) es necesario para el PDF. quarto's install tinytex
+        # es idempotente: si ya está, no hace nada.
+        if shutil.which("quarto") is not None:
+            print("\n=== TinyTeX check (necesario para PDF) ===")
+            steps_ok.append(step("quarto install tinytex",
+                                 ["quarto", "install", "tinytex", "--quiet"]))
         steps_ok.append(step("quarto render html",
                               ["quarto", "render", "informe.qmd", "--to", "html",
                                "--output-dir", "reports", "--no-cache"]))

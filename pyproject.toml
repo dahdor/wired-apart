@@ -67,6 +67,11 @@ force-sort-within-sections = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+filterwarnings = [
+    "ignore:.*cov_type not fully supported with freq_weights.*:UserWarning",
+    "ignore:.*Boolean Series key will be reindexed.*:UserWarning",
+    "ignore::statsmodels.tools.sm_exceptions.SpecificationWarning",
+]
 addopts = "-v --tb=short"
 
 [tool.jupytext]

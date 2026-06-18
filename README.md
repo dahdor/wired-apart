@@ -93,45 +93,43 @@ wired-apart/
 
 ## Cómo reproducir el análisis
 
-### Requisitos
+El proyecto está diseñado para ser reproducible con un solo comando
+después de instalar los requisitos listados abajo. El pipeline es
+**idempotente**: re-ejecuciones producen los mismos outputs (mismo SHA256).
+
+### Requisitos de software
 
 - [Python 3.12](https://www.python.org/)
 - [uv](https://docs.astral.sh/uv/) (gestor de dependencias y entornos)
-- [Quarto ≥ 1.9](https://quarto.org/docs/get-started/) (para el informe)
-- [TeX](https://quarto.org/docs/output-formats/pdf-basics.html) o [Typst](https://quarto.org/docs/output-formats/pdf-basics.html) (para el PDF)
-- Microsoft Access ODBC Driver (Windows, para la descarga inicial de YRBS) o pre-colocar los `.mdb` en `data/raw/yrbs/`
+- [Quarto ≥ 1.9](https://quarto.org/docs/get-started/) (para el informe HTML/PDF)
 - *(Opcional)* [`make`](https://www.gnu.org/software/make/) para los atajos. **No es requerido** — cada target tiene un equivalente directo en `uv run`.
+- *(Solo Windows, opcional)* [Microsoft Access ODBC Driver](https://www.microsoft.com/en-us/download/details.aspx?id=54920) para la descarga inicial de YRBS. Si no, **el stacked raw parquet ya está commiteado** en `data/processed/yrbs_2005_2021.parquet` y puedes saltarte el notebook 0.0.
+- **TinyTeX (LaTeX)** se instala automáticamente al ejecutar `make install` (vía `quarto install tinytex`). No requiere acción manual.
 
-### Pasos con `make` (recomendado)
+### Pasos con `make` (recomendado, todas las plataformas)
 
 ```bash
 # 1. Clonar
 git clone https://github.com/dahdor/wired-apart.git
 cd wired-apart
 
-# 2. Instalar dependencias y crear el venv
+# 2. Instalar dependencias y crear el venv (incluye TinyTeX para el PDF)
 make install
 
-# 3. Colocar los datos crudos en data/raw/yrbs/  (ver references/data_provenance.md)
-#    Si no los tenés, notebook 0.0 los descarga automáticamente desde CDC.
-
-# 4. Ejecutar todo el pipeline (5-10 min end-to-end)
-make all           # equivalente a: make pipeline && make report
-
-# O paso a paso:
-make pipeline      # ejecuta los 8 notebooks en orden
-make report        # renderiza el informe a HTML y PDF
-make clean         # borra pyc, __pycache__, .ipynb_checkpoints
-make lint          # ruff check + format check
-make format        # auto-format con ruff
-make download      # descarga YRBS .mdb y NCHS Socrata (idempotente)
-make test          # 27 tests pytest (integridad, anti-regresión)
-make validate      # download + pipeline + report + tests + check outputs (todo en uno)
+# 3. Ejecutar todo el pipeline (descarga + notebooks + informe + tests)
+make validate
 ```
 
-### Pasos sin `make` (equivalentes portables para Windows/macOS)
+**En Windows**, `make install` + `make validate` son suficientes. No
+necesitas el driver ODBC porque el stacked raw parquet está commiteado
+y `validate_pipeline.py` salta automáticamente el notebook 0.0 en
+plataformas no-Windows.
 
-`make` no viene preinstalado en Windows ni en macOS. Si no lo tenés, los mismos comandos funcionan con `uv` directamente:
+**En Linux/macOS**, lo mismo. El driver ODBC no se necesita: solo se
+usa para regenerar el stacked raw desde los `.mdb` originales (notebook
+0.0), pero ese output ya está commiteado.
+
+Si preferís no usar `make`, los mismos comandos funcionan con `uv` directamente:
 
 ```bash
 # 1. Clonar
@@ -141,17 +139,27 @@ cd wired-apart
 # 2. Instalar dependencias
 uv sync --all-extras
 
-# 3. Pipeline: ejecutar cada notebook end-to-end
-# IMPORTANTE: usar nbconvert --execute --inplace (no `jupyter execute` que
-# no guarda outputs en Windows).
-for nb in notebooks/*.ipynb; do
-  uv run jupyter nbconvert --to notebook --execute --inplace "$nb"
-done
-
-# 4. Renderizar el informe (HTML y PDF)
-uv run quarto render informe.qmd --to html
-uv run quarto render informe.qmd --to pdf
+# 3. Pipeline + render (notebooks 1.0–5.0, luego Quarto HTML+PDF)
+uv run python scripts/validate_pipeline.py --skip-download
 ```
+
+**Notas para Windows:**
+- `make` no viene preinstalado; instalalo con [Chocolatey](https://chocolatey.org/install) (`choco install make`) o usa los comandos `uv` de arriba.
+- Git Bash o PowerShell funcionan; los comandos son portables.
+- `jupyter nbconvert --execute --inplace` es el método correcto para ejecutar notebooks en Windows (no usar `jupyter execute`, que tiene bugs conocidos en Windows).
+
+### Targets de `make` disponibles
+
+| Target | Qué hace |
+|---|---|
+| `make install` | `uv sync --all-extras` + `quarto install tinytex` |
+| `make test` | 32 tests pytest (integridad, anti-regresión) |
+| `make pipeline` | Ejecuta los 8 notebooks en orden (skip 0.0 en Linux/macOS) |
+| `make report` | Renderiza el informe a HTML y PDF |
+| `make validate` | download + pipeline + report + tests + check outputs |
+| `make download` | Descarga YRBS .mdb + NCHS Socrata (idempotente, skip ODBC en Linux) |
+| `make clean` | Borra pyc, __pycache__, .ipynb_checkpoints |
+| `make lint` / `format` | ruff check / auto-format |
 
 ### Solo regenerar el informe (sin re-ejecutar notebooks)
 
@@ -172,31 +180,26 @@ Los outputs se guardan en `reports/informe.html` y `reports/informe.pdf`.
 
 El proyecto está diseñado para que un clon fresco pueda regenerar **todos** los outputs (datos limpios, figuras, informe HTML+PDF) sin intervención manual.
 
-### Flujo de un solo comando
+### Flujo recomendado (cualquier plataforma)
 
 ```bash
-# Clonar, instalar, descargar, ejecutar pipeline, renderizar, validar.
+# Clonar, instalar, ejecutar pipeline, renderizar, validar.
 git clone https://github.com/dahdor/wired-apart.git
 cd wired-apart
-make install      # uv sync --all-extras (crea .venv, instala deps)
-make download     # descarga YRBS .mdb de CDC y NCHS Socrata
-make pipeline     # ejecuta los 8 notebooks en orden
-make report       # renderiza informe.qmd a HTML y PDF
-make test         # corre pytest con 27 tests anti-regresión
-make validate     # todo lo anterior + verificación de outputs
+make install      # uv sync --all-extras + quarto install tinytex
+make validate     # pipeline + report + tests (skip-download si ya tenés los datos)
 ```
-
-En Windows, `make download` se salta la conversión de YRBS .mdb a Parquet (requiere Microsoft Access ODBC) y usa el stacked raw ya commiteado en `data/processed/yrbs_2005_2021.parquet`.
 
 ### Componentes de reproducibilidad
 
 | Componente | Ubicación | Propósito |
 |---|---|---|
-| **`uv.lock`** | raíz | Versiones exactas de todas las dependencias (118 paquetes). |
+| **`uv.lock`** | raíz | Versiones exactas de todas las dependencias (145 paquetes). |
 | **`scripts/download_data.py`** | scripts/ | Descarga YRBS .mdb + NCHS Socrata, verifica SHA-256. Idempotente. |
 | **`scripts/validate_pipeline.py`** | scripts/ | Ejecuta download → pipeline → report → tests → check outputs. Detecta plataforma para saltar pasos Windows-only. |
-| **`scripts/fix_attempted_suicide.py`** | scripts/ | Reproduce la corrección del bug #1 del CHANGELOG sin necesidad de ODBC. |
-| **`tests/`** | tests/ | 27 tests pytest: integridad de schema, codificación, anti-regresión de headlines, funciones puras. |
+| **`scripts/fix_attempted_suicide.py`** | scripts/ | Reproduce la corrección del bug de `attempted_suicide_yesno` (CHANGELOG #1) sin ODBC. |
+| **`scripts/fix_hispanic_yesno.py`** | scripts/ | Reproduce la corrección del bug de `hispanic_yesno` 2005 (CHANGELOG #21) sin ODBC. |
+| **`tests/`** | tests/ | 32 tests pytest: integridad de schema, codificación, anti-regresión de headlines, funciones puras, anti-regresión de los 4 fixes de la auditoría jun-2026. |
 | **`.github/workflows/ci.yml`** | .github/workflows/ | CI en Linux y Windows: ejecuta `validate_pipeline.py` end-to-end, sube HTML y PDF como artifacts. |
 | **`CHANGELOG.md`** | raíz | Historial de correcciones con impacto y archivos modificados. |
 | **`references/data_provenance.md`** | references/ | SHA-256 de cada archivo crudo YRBS + URLs + cobertura. |
@@ -206,16 +209,16 @@ En Windows, `make download` se salta la conversión de YRBS .mdb a Parquet (requ
 ### Garantías
 
 - **Determinismo:** seeds explícitos en `config.RANDOM_SEED`; los notebooks no usan procesos estocásticos reales (todas las estadísticas son ponderadas o deterministas).
-- **Idempotencia:** `download_data.py` salta archivos ya verificados por SHA-256; `validate_pipeline.py` puede correr múltiples veces sin side effects.
-- **Auditabilidad:** 27 tests pytest detectan cambios accidentales (e.g., el bug #1 de `attempted_suicide_yesno` tiene un test anti-regresión dedicado que compara con tasas oficiales del CDC).
-- **Plataforma:** CI corre en Linux (ubuntu) y Windows; el script `validate_pipeline.py` detecta la plataforma y salta pasos no aplicables.
+- **Idempotencia:** los notebooks de cleaning (1.0, 1.1) producen el mismo SHA256 en re-runs sucesivos. `download_data.py` y `validate_pipeline.py` pueden correr múltiples veces sin side effects.
+- **Auditabilidad:** 32 tests pytest detectan cambios accidentales (incluyendo los 4 fixes críticos de la auditoría jun-2026: `hispanic_yesno` 2005, Simpson ponderado, OR/χ² consistente, CA cluster-robust).
+- **Plataforma:** CI corre en Linux y Windows; el script `validate_pipeline.py` detecta la plataforma y salta el notebook 0.0 (Windows-only) automáticamente.
 
 ### Limitaciones honestas de la reproducibilidad
 
-- **Notebook 0.0 (adquisición YRBS .mdb) requiere Windows + Microsoft Access ODBC driver.** En Linux/macOS, los .mdb se descargan pero no se pueden convertir. El stacked raw parquet commiteado resuelve esto.
-- **NCHS HUS 2018 Table 9** se extrae manualmente del PDF (12 valores para 2010, 2016, 2017). El PDF está commiteado en `data/external/` pero los valores extraídos están hardcodeados en el notebook 1.1.
-- **NCHS Data Brief 471** (figura con mortalidad agregada ambos sexos 7.5→12.0/100k) es lectura humana del PDF; los valores no se computan del pipeline automatizado.
-- **Quirk de Quarto 1.9:** con `output-dir: reports` en `_quarto.yml`, los outputs a veces se crean en la raíz. Workaround: pasar `--output-dir reports` explícito (lo hace el script validate).
+- **Notebook 0.0 (adquisición YRBS .mdb) solo corre en Windows con Microsoft Access ODBC.** En otras plataformas, los `.mdb` se descargan pero no se pueden convertir a Parquet. **No es bloqueante:** el stacked raw parquet commiteado (`data/processed/yrbs_2005_2021.parquet`, 6.2 MB) permite ejecutar todo el pipeline sin esa dependencia. Si necesitás regenerar el stacked raw, hacelo una vez en Windows y commitea el resultado.
+- **NCHS HUS 2018 Table 9:** los 12 valores (2010, 2016, 2017) están hardcodeados en el notebook 1.1. El PDF original está commiteado en `data/external/`. Si los valores oficiales cambian, hay que actualizar manualmente el notebook.
+- **NCHS Data Brief 471:** la cifra "7.5/100k (2010) → 12.0/100k (2018)" es lectura humana del PDF, no se computa del pipeline automatizado.
+- **Quarto 1.9 quirk:** con `output-dir: reports` en `_quarto.yml`, los outputs a veces se crean en la raíz. Workaround: pasar `--output-dir reports` explícito (lo hace el script `validate_pipeline.py`).
 
 ---
 
@@ -248,7 +251,13 @@ En Windows, `make download` se salta la conversión de YRBS .mdb a Parquet (requ
 ### 1. Tendencia global: sad/hopeless 2005-2021
 
 - **28.5% (2005) → 42.3% (2021) = +13.8pp (+48%)** en 16 años.
-- Cochran-Armitage trend test: pendiente mujeres +1.09pp/año (p<0.001); hombres +0.44pp/año (p<0.001).
+- Test de tendencia (jun-2026, survey-weighted logistic regression con SE
+  cluster-robust en PSU): log-OR/año mujeres = +0.0471 (z=12.4, p<0.001);
+  hombres = +0.0269 (z=8.7, p<0.001). OR acumulada 2005→2021: **2.13 mujeres
+  (IC95 1.89-2.39) y 1.54 hombres (IC95 1.40-1.70)**. Pendiente en pp/año
+  (delta-method): ~+1.14 mujeres, ~+0.47 hombres. *Nota:* el log-OR/año
+  resume la tendencia media en la escala log-odds; los datos son no
+  lineales (aceleración post-2015).
 - Aceleración post-2015: 2017-2021 aporta +10.8pp de los 13.8pp totales.
 
 ### 2. Asimetría de género amplificándose (LA CIFRA CLAVE)
@@ -289,7 +298,10 @@ La curva es **decreciente para 0–1h y luego creciente**, no monotónica. El m�
 
 - Pre (2005-2009): 27.6% sad/hopeless, n=43,811.
 - Post (2017-2021): 37.1% sad/hopeless, n=45,003.
-- Diferencia: **+9.5pp**, χ²=919, p<0.001, OR=1.55.
+- Diferencia: **+8.6pp**, Wald χ²=141.6, p<0.001, **OR=1.48 (IC95 1.39-1.58)**
+  (jun-2026, regresión logística ponderada con SE cluster-robust en PSU;
+  DEFF=2.69, es decir, el diseño muestral infla el SE en ~170% respecto
+  al IID).
 
 ### 6. Paradoja de Simpson
 
@@ -337,7 +349,8 @@ Estratificación por sexo × raza (8 categorías CDC, válida 2007+). **No hay i
 6. **Reporte de eventos sensibles** (suicidio, screen time) en encuestas escolares está sujeto a desirability bias y subreporte.
 7. **PHQ-5 autoreportado** puede tener desirability bias post-intervención (los estudiantes saben que el programa usa la encuesta).
 8. **Generalización cultural.** Contexto USA 2010-2021; transferibilidad a otros países no se asume.
-9. **Diseño muestral complejo no modelado (jun-2026).** Las regresiones usan `weight` como `freq_weights` pero **ignoran la estructura de conglomerados** (`stratum`+`psu`). Esto subestima los errores estándar y produce IC95 más estrechos y p-valores más optimistas de lo correcto. Análisis definitivo requeriría `cov_type='cluster'` en `statsmodels` o el módulo `samplics`. **Las conclusiones direccionales se mantienen**, pero la magnitud exacta de los IC95 y p-valores debe interpretarse con cautela.
+9. **Diseño muestral complejo — ahora modelado en los análisis 2 y 5 (jun-2026).** Las regresiones de tendencia (análisis 2) y pre/post (análisis 5) usan **errores cluster-robust agrupados por PSU** (`cov_type='cluster'`), lo que corrige la subestimación de SE que existía al usar solo `freq_weights`. El DEFF ≈ 2.7, es decir, el SE cluster-robust es ~170% del SE IID. Los IC95 son más anchos y honestos. **Pendientes:** los análisis 3 (regresión logística con año+sexo+edad) y 4 (regresión screen time 2019) todavía usan `freq_weights` sin cluster-robust. Quedan como trabajo futuro, pero no afectan el headline (las conclusiones direccionales son robustas).
+10. **Simpson reescrito con medias ponderadas + bootstrap CIs (jun-2026).** La versión previa usaba medias no ponderadas, lo que invertía el signo en 3 celdas (F-NHPI, M-Hispanic, M-Multi) y producía una narrativa falsa de "excepciones protectoras" en hombres. La nueva versión usa proporciones ponderadas y bootstrap CIs; las "excepciones" se debilitan (los cambios no son significativamente distintos de 0 pero tampoco outliers negativos). Celdas con n_pre < 200 (F-AmIndian, F-NHPI, M-NHPI) se marcan con `*` en el heatmap.
 
 ---
 

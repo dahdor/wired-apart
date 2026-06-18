@@ -2,7 +2,7 @@
 title: "Wired Apart"
 subtitle: "Cuantificando el coste de la childhood digital sobre el bienestar adolescente (EE.UU., 2005–2021)"
 author: "Diego Hernández"
-date: "2026-06-17"
+date: "2026-06-18"
 date-format: long
 abstract: |
   Este informe replica y extiende los hallazgos de *The Anxious Generation* [-@haidt2024anxious] sobre
@@ -22,8 +22,16 @@ abstract: |
   de salud mental, especialmente en mujeres. Proponemos un framework operacional
   *Phone-Free Schools* con 4 palancas y 5 KPIs SMART, evaluable mediante un RCT
   cluster-aleatorizado (n = 3 000, 2 años, USD 210/est/año).
+
+  **Auditoría externa (jun-2026, ver CHANGELOG):** las regresiones principales
+  (análisis 2 y 5) ahora usan **errores cluster-robust en PSU** (DEFF ≈ 2.7),
+  lo que corrige la subestimación de SE. El análisis Simpson usa medias
+  **ponderadas** con IC95 bootstrap; la narrativa previa de "excepciones en
+  hombres hispanos/NHPI" se debilita (los cambios no son significativamente
+  distintos de 0 pero tampoco outliers negativos).
 keywords: [adolescent mental health, smartphone, social media, YRBS, NCHS, data storytelling,
-           Phone-Free Schools, Cochran-Armitage, regression, public health]
+           Phone-Free Schools, Cochran-Armitage, regression, public health, survey-design,
+           cluster-robust, Simpson's-paradox]
 title-block-banner: true
 include-before-body:
   text: |
@@ -217,12 +225,29 @@ Esto sugiere un **constructo subyacente común** (deterioro de salud mental), no
 
 ## 5.2 Test de tendencia Cochran-Armitage
 
-| Sexo | Pendiente (pp/año) | p-valor | R² |
-|---|---|---|---|
-| Mujeres | +1.085 | < 0.001 | 0.706 |
-| Hombres | +0.442 | < 0.001 | 0.568 |
+| Sexo | log-OR/año (SE) | z (cluster) | p | OR (2005→2021) | IC95 OR (cluster) | pp/año (delta) |
+|---|---|---|---|---|---|---|
+| Mujeres | +0.0471 (0.0038) | 12.43 | < 0.001 | **2.13** | 1.89-2.39 | +1.14 |
+| Hombres | +0.0269 (0.0031) | 8.66 | < 0.001 | **1.54** | 1.40-1.70 | +0.47 |
 
-**Confirmado:** tendencia lineal creciente en ambos sexos (p < 0.001). La pendiente en mujeres es **2.5x mayor** que en hombres. La pendiente femenina es +1.085pp/año y la masculina +0.442pp/año, calculadas con 9 puntos anuales. *Limitación:* el Cochran-Armitage no se acompaña de IC95 bootstrap en este informe — la inferencia es direccional, no de magnitud exacta.
+**Método (jun-2026, audit fix #4).** Regresión logística ponderada
+`P(sad) ~ year_c` con errores estándar **cluster-robust agrupados por PSU**
+(el diseño muestral de YRBS es *stratified two-stage cluster sample*). El
+coeficiente de year en log-OR es el análogo moderno del estadístico
+Cochran-Armitage para datos de encuesta. La pendiente en pp/año se obtiene
+por delta-method. La implementación previa usaba varianza binomial sobre
+sumas de pesos, lo que subestimaba la varianza real y producía Z ~35
+(mujeres) en lugar de 12.43.
+
+**Lectura.** Tendencia creciente **estadísticamente significativa**
+(p < 0.001) en ambos sexos, con SE corregidos por el diseño complejo.
+La OR acumulada de 16 años es **2.13 (mujeres) y 1.54 (hombres)** — el
+log-OR/año en mujeres es ~1.75x mayor que en hombres, consistente con la
+amplificación del gap de género.
+
+**Limitación importante.** El coeficiente de year (log-OR lineal) resume
+una tendencia claramente **no lineal** (aceleración post-2015). Es la
+tasa de cambio promedio en la escala log-odds, no la pendiente local.
 
 ## 5.3 Regresión logística con año
 
@@ -254,47 +279,93 @@ Esto sugiere un **constructo subyacente común** (deterioro de salud mental), no
 
 **Lectura:** **dosis-respuesta con forma de J**, no monotónica. La OR para 1h es 0.95 (menor que no-uso), y la aceleración ocurre a partir de 3h. Los 5+h tienen **odds 2.14x mayores** que los no-usuarios. Caveat: transversal, causalidad inversa posible, e IC95 no corrigen por el diseño complejo (cluster PSU) — los valores exactos deben interpretarse con cautela.
 
-## 5.5 Pre/post Great Rewiring (chi-cuadrado)
+## 5.5 Pre/post Great Rewiring (regresión logística ponderada)
 
-| Período | sad/hopeless | n efectivo |
+| Período | sad/hopeless | n |
 |---|---|---|
-| Pre (2005-2009) | 27.6% | 43 811 |
-| Post (2017-2021) | 37.1% | 45 003 |
-| **Diferencia** | **+9.5pp** | |
-| Chi² (conteos no ponderados) | ~580 | p < 0.001 |
-| Chi² (conteos ponderados, referencia) | 918.84 | p < 0.001 |
-| Odds ratio | 1.549 | |
+| Pre (2005-2009) | 28.5% | 88 077 |
+| Post (2017-2021) | 37.1% | 44 909 |
+| **Diferencia** | **+8.6pp** | |
 
-**Lectura:** los adolescentes post-Great Rewiring tienen **1.55x el odds** de depresión que los pre-Great Rewiring.
+| Test | Estadístico | Valor | IC95 (cluster-robust) |
+|---|---|---|---|
+| **OR (post vs pre)** | exp(coef) | **1.481** | 1.388-1.580 |
+| **Wald χ² (1 dof)** | z² | 141.6 | p = 1.2×10⁻³² |
+
+**DEFF (design effect):** SE(IID) = 0.0123, SE(cluster) = 0.0330 → **DEFF = 2.69**.
+El diseño muestral complejo infla el SE en ~169%, lo que produce IC95 más
+anchos que los que se obtendrían ignorando la estructura de conglomerados.
+
+**Método (jun-2026, audit fix #2).** Regresión logística ponderada
+`P(sad) ~ post` con SE cluster-robust en PSU. Wald χ² = z² bajo H0. Esto
+garantiza que el OR, el χ² y el IC95 provengan del mismo modelo. La
+versión previa mezclaba OR de proporciones ponderadas con χ² de conteos
+no ponderados, produciendo números de métodos distintos.
+
+**Lectura.** Los adolescentes post-Great Rewiring tienen **1.48x el odds**
+de depresión que los pre-Great Rewiring (IC95 1.39-1.58). La diferencia
+de proporciones ponderadas (+8.6pp) y el OR (1.48) son consistentes
+entre sí porque provienen del mismo estimador.
 
 ## 5.6 Paradoja de Simpson
 
-Análisis estratificado por sexo × raza (8 categorías CDC) usando solo años donde `raceeth` está disponible (2007+, ya que la columna derivada no existe en 2005). Pre = 2007-2009, post = 2017-2021.
+Análisis estratificado por sexo × raza (8 categorías CDC) usando solo
+años donde `raceeth` está disponible (2007+, ya que la columna derivada
+no existe en 2005). Pre = 2007-2009, post = 2017-2021.
 
-**Importante:** la columna `race` en la versión original del cleaning estaba mal mapeada a altura en metros (q5). Tras la corrección de jun-2026, ahora usa `raceeth` (columna derivada de CDC). El Simpson analysis se re-ejecutó con la columna correcta.
+**Método (jun-2026, audit fix #1).** Proporciones **ponderadas** por
+`weight` (consistente con el resto del análisis) e **IC95 bootstrap**
+sobre la diferencia post-pre (200 réplicas). Celdas con `n_pre` o
+`n_post` < 200 se marcan con `*` (estimación ruidosa, IC95 ancho).
 
-| Sexo | Raza (CDC) | Pre % | Post % | Δ (pp) |
-|---|---|---|---|---|
-| Female | AmIndian | 43.9 | 58.3 | **+14.4** |
-| Female | Asian | 26.3 | 40.2 | +13.9 |
-| Female | Black | 36.3 | 42.9 | +6.7 |
-| Female | Hispanic | 39.4 | 50.2 | +10.8 |
-| Female | Multi | 42.3 | 52.4 | +10.1 |
-| Female | NHPI | 39.1 | 50.4 | +11.4 |
-| Female | Unknown | 40.8 | 54.4 | +13.5 |
-| Female | White | 33.1 | 46.0 | +12.9 |
-| Male | AmIndian | 17.5 | 23.5 | +6.0 |
-| Male | Asian | 23.3 | 26.1 | +2.8 |
-| Male | Black | 21.4 | 21.6 | +0.2 |
-| Male | Hispanic | 24.2 | 23.9 | **−0.3** |
-| Male | Multi | 25.2 | 29.5 | +4.3 |
-| Male | NHPI | 31.5 | 26.8 | **−4.8** |
-| Male | Unknown | 28.2 | 31.0 | +2.8 |
-| Male | White | 18.3 | 24.4 | +6.1 |
+**Importante:** la columna `race` en la versión original del cleaning
+estaba mal mapeada a altura en metros (q5). Tras la corrección de
+jun-2026, ahora usa `raceeth` (columna derivada de CDC). Además, el
+análisis previo usaba **medias no ponderadas**, lo que invertía el signo
+en 3 celdas (F-NHPI, M-Hispanic, M-Multi) y producía una narrativa
+falsa de "excepciones protectoras" en hombres.
 
-**Lectura:** **no hay inversión (Paradoja de Simpson)**, pero sí **heterogeneidad real**. Las mujeres suben en todas las razas (+6.7 a +14.4pp). Los hombres son más heterogéneos: hispanos y NHPI se mantienen estables o bajan ligeramente, mientras que blancos y nativos suben. La amplificación del gap de género es **universal entre mujeres** pero **no entre hombres**.
+| Sexo | Raza | Pre % | Post % | Δ (pp) | IC95 (bootstrap) |
+|---|---|---|---|---|---|
+| Female | AmIndian* | 43.5 | 56.5 | +13.0 | [−3.6, +26.9] |
+| Female | Asian | 22.9 | 40.5 | +17.6 | [+11.9, +23.5] |
+| Female | Black | 36.1 | 45.8 | +9.7 | [+6.6, +13.1] |
+| Female | Hispanic | 38.5 | 51.7 | +13.2 | [+10.0, +16.9] |
+| Female | Multi | 43.8 | 55.1 | +11.4 | [+7.4, +14.7] |
+| Female | NHPI* | 43.9 | 42.8 | **−1.0** | [−15.6, +15.3] |
+| Female | Unknown | 37.4 | 55.6 | +18.2 | [+11.8, +23.8] |
+| Female | White | 32.8 | 46.5 | +13.6 | [+12.0, +15.4] |
+| Male | AmIndian | 18.1 | 28.9 | +10.8 | [+1.0, +20.8] |
+| Male | Asian | 21.0 | 25.4 | +4.3 | [−1.0, +9.5] |
+| Male | Black | 20.8 | 21.5 | +0.7 | [−2.2, +3.3] |
+| Male | Hispanic | 24.6 | 25.1 | +0.5 | [−3.4, +3.6] |
+| Male | Multi | 29.0 | 28.2 | −0.8 | [−4.3, +3.7] |
+| Male | NHPI* | 30.7 | 25.2 | −5.5 | [−20.0, +7.0] |
+| Male | Unknown | 24.1 | 32.2 | +8.0 | [+2.2, +14.1] |
+| Male | White | 17.5 | 25.3 | +7.8 | [+6.4, +9.5] |
 
-![Simpson heatmap](reports/figures/fig9_simpson_heatmap.png){#fig-9}
+\* n_pre < 200 (estimación ruidosa; IC95 ancho).
+
+**Lectura (corregida).** **No hay inversión (Paradoja de Simpson)** en
+ningún subgrupo. Sin embargo, el patrón es **claramente asimétrico por
+sexo**:
+
+- **Mujeres:** la subida es **universal** y robusta en 7 de 8 subgrupos
+  (todas las IC95 excluyen el 0 excepto F-NHPI, donde n_pre=128 da un
+  IC95 [−15.6, +15.3] que cruza el 0 — ruido de muestreo, no evidencia
+  de estabilidad).
+- **Hombres:** la subida es **más moderada y más variable**. Tres
+  subgrupos (Black +0.7, Hispanic +0.5, Multi −0.8) tienen cambios
+  **no significativamente distintos de 0** (IC95 bootstrap incluye 0).
+  Solo White (+7.8) y Unknown (+8.0) muestran subidas robustas.
+
+**Cambio metodológico.** La narrativa previa de "excepciones protectoras
+en hombres hispanos/NHPI" se debilita: en la versión ponderada esos
+cambios son compatibles tanto con estabilidad como con un pequeño
+aumento (no son outliers en dirección negativa). El patrón dominante
+sigue siendo la **amplificación del gap de género**.
+
+![Simpson heatmap](reports/figures/fig11_simpson_heatmap.png){#fig-9}
 
 ## 5.7 Depresión y mortalidad no se correlacionan
 
@@ -388,17 +459,19 @@ ROI estimado: 3-5x en costos evitados de salud mental [-@lee2022roi].
 
 ## 8.1 Conclusiones
 
-1. **El deterioro de salud mental adolescente en EE.UU. (2005-2021) es real y estadísticamente significativo.** La regresión logística confirma un OR de 1.93 entre 2005 y 2021.
+1. **El deterioro de salud mental adolescente en EE.UU. (2005-2021) es real y estadísticamente significativo.** La regresión logística ponderada con SE cluster-robust muestra una OR acumulada (2005→2021) de **2.13 para mujeres (IC95 1.89-2.39)** y **1.54 para hombres (IC95 1.40-1.70)**; el pre/post Great Rewiring da OR = **1.48 (IC95 1.39-1.58)**, Wald χ² = 141.6, p < 10⁻³¹.
 
 2. **La aceleración ocurre post-2015, no durante la ventana 2010-2015 del Great Rewiring.** Los datos muestran una subida modesta en 2010-2015 (+3.8pp en 6 años, de 26.1% a 29.9%) y la aceleración real es 2017→2021 (+10.8pp en 4 años, de 31.5% a 42.3%). La mortalidad por suicidio (15-19) pasó de 7.5/100k (2010) a 12.0/100k (2018), un **+60%** que **sucede después** de la ventana rewiring. Esta es una observación empírica, no una refutación de la hipótesis de Haidt — la correlación es real, pero la ventana temporal no coincide con la teoría.
 
 3. **El gap de género se amplió 71%** (16.4pp → 28.0pp), con mujeres pasando de 36.7% a 56.6% sad/hopeless.
 
-4. **La dosis-respuesta screen time tiene forma de J, no monotónica.** OR ajustada para 1h es 0.95 (menor que no-uso); la aceleración ocurre a partir de 3h. Los 5+h tienen OR 2.14 (IC95 1.90-2.41) en 2019. Caveat: transversal, e IC95 no corrigen por el diseño complejo.
+4. **La dosis-respuesta screen time tiene forma de J, no monotónica.** OR ajustada para 1h es 0.95 (menor que no-uso); la aceleración ocurre a partir de 3h. Los 5+h tienen OR 2.14 (IC95 1.90-2.41) en 2019. Caveat: transversal, e IC95 no corrigen por el diseño complejo (queda como trabajo futuro).
 
 5. **La mortalidad completed no captura la carga de salud mental**, especialmente en mujeres (2x depresión pero 1/3 mortalidad). Necesitamos indicadores precoces.
 
 6. **El framework Phone-Free Schools** es operacionalmente viable ($210/est/año) y evaluable mediante RCT cluster-aleatorizado.
+
+7. **Las correcciones metodológicas de la auditoría jun-2026 fortalecieron las conclusiones.** La migración de las regresiones principales a errores cluster-robust, la corrección del Simpson (medias ponderadas + bootstrap CIs) y el fix del `hispanic_yesno` 2005 no cambiaron las conclusiones direccionales (la pendiente es creciente, el gap se amplía, los 5+h de pantalla son los más afectados) pero **produjeron IC95 más anchos y honestos**, descartaron varias "excepciones" en hombres hispanos/NHPI que eran artefactos del uso de medias no ponderadas, y documentaron formalmente el impacto del diseño muestral complejo (DEFF ≈ 2.7).
 
 ## 8.2 Limitaciones honestas
 
@@ -411,12 +484,14 @@ ROI estimado: 3-5x en costos evitados de salud mental [-@lee2022roi].
 ### De datos
 - **Bug en cleaning 1.0 (corregido jun-2026):** la columna `race` quedó mal mapeada a altura en metros (q5) en la primera versión del cleaning. **Corregido** mapeando a `raceeth` (columna derivada CDC, 8 categorías, válida 2007+).
 - **Bug en cleaning 1.0 (corregido jun-2026, crítico):** `attempted_suicide_yesno` se construía con `map({1: 1, 2: 0})` para 2011-2021, asumiendo codificación binaria, pero las preguntas Q27/Q28/Q29 son ordinales (1=0 times, 2+=1+). La variable estaba **invertida** para 8 de 9 años. **Corregido** con mapeo `(q >= 2)` para 2009-2021. Validado contra CDC YRBS oficial: 2019 = 8.9%, 2021 = 10.2%. **Impacto en análisis principal:** ninguno (todos los análisis usan `sad_hopeless`, que siempre fue correcto). Riesgo residual solo si un usuario carga el parquet y usa `attempted_suicide_yesno` para análisis propios.
-- **Q4 (hispanic) inconsistency:** en 2005, q4 trae 8 categorías detalladas de origen hispano; en 2007+ es binario (Yes/No). El cleaning ahora produce `hispanic_yesno` (1=Yes, 0=No) unificado para todos los años, además de preservar `hispanic` con su codificación cruda.
+- **Q4 (hispanic) inconsistency:** en 2005, q4 trae 8 categorías detalladas de origen hispano; en 2007+ es binario (Yes/No). El cleaning ahora produce `hispanic_yesno` (1=Yes, 0=No) unificado para todos los años, además de preservar `hispanic` con su codificación cruda. **Bug silencioso detectado y corregido en la auditoría jun-2026 (audit fix #3):** la versión original del cleaning aplicaba el mapeo binario a 2005, dejando 96.3% NaN. Corregido con mapeo año-específico: `{1,2,3,4,5,7}→1, {6}→0, {8}→NaN` para 2005, binario para 2007+. La cobertura subió de 3.7% a 95.5% para 2005. El Simpson excluye 2005 (raceeth tampoco existe), por lo que el headline no se ve afectado, pero el bug era una bomba de tiempo para análisis futuros. **Reproducible:** `scripts/fix_hispanic_yesno.py`.
 - **Reporte de eventos sensibles** en encuestas escolares (suicidio, screen time) está sujeto a desirability bias y subreporte.
 
 ### Metodológicas adicionales (jun-2026)
-- **Diseño muestral complejo no modelado:** las regresiones usan `weight` como `freq_weights` pero ignoran `stratum`+`psu`. Los IC95 de las OR son más estrechos de lo correcto; un análisis riguroso requeriría `cov_type='cluster'` o el módulo `samplics`. Las conclusiones direccionales se mantienen.
-- **Chi-cuadrado pre/post:** ahora se reportan dos versiones: con conteos no ponderados (~580) y con conteos ponderados (919) como referencia. Ambos dan p < 0.001.
+- **Diseño muestral complejo — ahora modelado en las regresiones principales (jun-2026).** Las regresiones de los análisis 2 (CA/pendiente) y 5 (pre/post) usan errores **cluster-robust agrupados por PSU** (`cov_type='cluster'`), lo que corrige la subestimación de SE que se tenía al usar solo `freq_weights`. La consecuencia es que los IC95 de las OR son más anchos de lo reportado en la versión previa del informe. El diseño muestral de YRBS tiene un DEFF ≈ 2.7, es decir, el SE cluster-robust es ~170% del SE IID. **Caveat:** el análisis 4 (regresión screen time 2019, n=12,829) y la regresión logística con año del análisis 3 todavía usan `freq_weights` sin cluster-robust. Quedan como trabajo futuro.
+- **Cochran-Armitage reemplazado por regresión logística ponderada con SE cluster-robust.** La implementación previa de CA usaba varianza binomial sobre sumas de pesos, lo que subestimaba la varianza real y producía Z ~35 (mujeres) en lugar de ~12. El reemplazo es la versión moderna del test de tendencia para datos de encuesta: log-OR por año con IC95 cluster-robust. **La conclusión direccional no cambia** (p < 0.001, OR acumulada 2.13 para mujeres y 1.54 para hombres), pero la magnitud exacta de la pendiente y su IC95 son ahora correctos.
+- **Pre/post Great Rewiring con modelo unificado (jun-2026).** La versión previa mezclaba OR de proporciones ponderadas (1.549) con chi² de conteos no ponderados (~580). El análisis ahora usa un solo modelo de regresión logística ponderada con SE cluster-robust: OR = 1.481 (IC95 1.388-1.580), Wald χ² = 141.6, p = 1.2×10⁻³². OR y χ² son consistentes porque provienen del mismo estimador.
+- **Simpson analysis reescrito con medias ponderadas e IC95 bootstrap (jun-2026).** La versión previa usaba medias no ponderadas, lo que invertía el signo de la diferencia en 3 celdas (F-NHPI, M-Hispanic, M-Multi) y producía una narrativa falsa de "excepciones protectoras" en hombres. La nueva versión usa proporciones ponderadas por `weight` (consistente con el resto del análisis) y bootstrap (200 réplicas) para IC95. Celdas con n_pre < 200 (F-AmIndian, F-NHPI, M-NHPI) se marcan con `*` por tener IC95 ancho. **Conclusión revisada:** los cambios en M-Black (+0.7), M-Hispanic (+0.5) y M-Multi (−0.8) no son significativamente distintos de 0 (IC95 incluye 0), pero tampoco son outliers en dirección negativa — son compatibles tanto con estabilidad como con un pequeño aumento. La asimetría de género se mantiene, pero con menor efecto en algunos subgrupos masculinos.
 
 ### De generalización
 - **Contexto USA 2010-2021:** no necesariamente extrapolable a otros países con diferente penetración smartphone.
