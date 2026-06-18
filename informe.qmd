@@ -45,7 +45,7 @@ lang: es
 
 4. **Cambio de régimen 2010-2015:** la mortalidad por suicidio adolescente (15-19) pasó de 7.5/100k (2010) a 12.0/100k (2018), un **+60%** que coincide con la ventana del Great Rewiring.
 
-5. **Divorcio depresión-mortalidad:** las mujeres tienen 2x la tasa de depresión que los hombres, pero 1/3 de su mortalidad completed. La mortalidad no captura la carga de salud mental.
+5. **Depresión y mortalidad se divorcian:** las mujeres tienen 2x la tasa de depresión que los hombres, pero 1/3 de su mortalidad completed. La mortalidad no captura la carga de salud mental.
 
 **Propuesta.** Framework **Phone-Free Schools** con 4 palancas operacionales (recoger, reemplazar, monitorear, capacitar), 5 KPIs SMART con líneas base cuantificadas, y un diseño A/B (RCT cluster-aleatorizado, n = 3 000, 2 años, USD 210/est/año, ROI estimado 3-5x).
 
@@ -294,7 +294,7 @@ Análisis estratificado por sexo × raza (8 categorías CDC) usando solo años d
 
 ![Simpson heatmap](reports/figures/fig9_simpson_heatmap.png){#fig-9}
 
-## 5.7 Divorcio YRBS vs NCHS
+## 5.7 Depresión y mortalidad no se correlacionan
 
 Para 2019-2021, la correlación entre sad/hopeless (YRBS) y mortalidad 15-19 (NCHS) es **r = -0.07, p = 0.94** (n = 4 observaciones, sin poder).
 
@@ -309,7 +309,7 @@ Cualitativamente:
 
 **Lectura:** las mujeres tienen 2x la depresión de los hombres pero **un tercio** de su mortalidad. **La mortalidad no captura la carga de salud mental femenina.**
 
-![Divorcio](reports/figures/fig10_depression_vs_mortality.png){#fig-10}
+![Depresión y mortalidad](reports/figures/fig10_depresion_y_mortalidad.png){#fig-10}
 
 # 6. Discusión y storytelling {#sec-discusion}
 
