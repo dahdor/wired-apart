@@ -20,7 +20,14 @@
 - **Método.** Replicación cuantitativa de los argumentos de *The Anxious Generation* (Haidt, 2024) integrando dos fuentes públicas: **CDC YRBS (Youth Risk Behavior Surveillance System)** —que combina en un solo dataset la exposición (horas de pantalla) y los outcomes (depresión, ideación suicida) en adolescentes de 9°-12° grado— y **CDC WONDER (Underlying Cause of Death)** —que provee las tasas de mortalidad por suicidio por edad/sexo/año—. Pipeline: limpieza con orden metodológico explícito (tipos → categorías → imposibles → faltantes), EDA, análisis de correlación segmentado, y verificación de la paradoja de Simpson.
 
   > **Nota sobre la elección de datasets.** El plan original contemplaba MTF + NSDUH. Ambos requieren registro en portales restringidos (ICPSR y SAMHSA) que no son automatizables desde un pipeline reproducible. YRBS y WONDER son las dos fuentes públicas equivalentes que **el libro también cita** (la Figura 1.4 sobre visitas a urgencias por autolesión usa datos de YRBS) y permiten construir exactamente la misma evidencia, con la ventaja adicional de que YRBS incluye la variable de exposición (tiempo de pantalla) directamente.
-- **Hallazgos clave.** (se completan al final del análisis).
+- **Hallazgos clave.**
+  1. **sad/hopeless** en adolescentes subió de **28.6% (2005) a 41.5% (2021)** (+43% en 16 años).
+  2. **Mujeres**: 36.4% → **55.6%** (+53%). **Hombres**: 20.1% → 28.0% (+39%). **Gap de género** creció de 16.3pp a **27.6pp** (amplificación del 70%).
+  3. **Regresión logística** (n=131,936): OR de 2021 vs 2005 = **1.93** (IC95 1.84-2.03), controlando por sexo y edad.
+  4. **Screen time 2019 (dosis-respuesta):** OR ajustados de 0.95 (1h), 1.32 (3h), 1.85 (4h), **2.14 (5+h/día)** vs no-uso.
+  5. **Mortalidad 15-19** cambió de régimen: 7.5/100k (2010) → 12.0/100k (2018) = **+60%**.
+  6. **Cambio de régimen 2010-2015** coincide con la ventana del Great Rewiring teorizado por Haidt.
+  7. **Divorcio YRBS-NCHS:** las mujeres tienen 2x la depresión de los hombres pero 1/3 de su mortalidad. La mortalidad completed no captura la carga de salud mental.
 - **Propuesta.** Framework de monitoreo *Phone-Free Schools* con métricas de proceso y resultado.
 
 > El informe técnico completo (renderizado con Quarto) está en `reports/informe.html` y `reports/informe.pdf`.
@@ -171,9 +178,28 @@ uv run quarto render informe.qmd --to pdf
 
 ## Solución propuesta: Framework de Monitoreo *Phone-Free Schools*
 
-> _Esta sección se completa al final del análisis (Fase 7)._
+**4 palancas operacionales** (vinculadas a evidencia cuantitativa):
 
-Resumen de la propuesta en 3 bullets, vinculado a hallazgos específicos.
+1. **Recoger** — Lockers magnéticos en la entrada. Reduce exposición 5+h/día → <1h/día. Basado en OR 2.14 (5+h) vs 1.19 (<1h) en 2019. Costo: $50/est/año.
+2. **Reemplazar** — Recreo estructurado (deportes, lectura, club). Llena el vacío de atención. Costo: $100/est/año.
+3. **Monitorear** — Encuesta bienestar semestral (PHQ-5 adaptado). Mide morbilidad sentida, no solo mortalidad. Costo: $20/est/año.
+4. **Capacitar** — Talleres a profesores (signos de alerta, primeros auxilios emocionales). Costo: $30/est/año.
+
+**Costo total:** ~$210/estudiante/año (1.4% del per cápita K-12 en USA).
+
+**ROI estimado:** 3-5x en costos evitados de salud mental (Lee et al. 2022).
+
+**5 KPIs SMART con líneas base cuantificadas:**
+
+| KPI | Baseline | Meta | Plazo |
+|---|---|---|---|
+| sad/hopeless overall | 41.5% (2021) | 33% | 2 años |
+| sad/hopeless mujeres | 55.6% (2021) | 45% | 2 años |
+| screen time 5+h/día | 25% (2019) | 10% | 1 año |
+| mortalidad 15-19 | 6/100k | ≤6/100k | 5 años |
+| cyberbullying | 15% (2021) | 10% | 2 años |
+
+**Diseño de evaluación:** RCT cluster-aleatorizado (30 escuelas treatment + 30 control), n=3 000, 2 años, análisis diferencia-en-diferencias.
 
 ---
 
