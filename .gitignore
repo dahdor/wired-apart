@@ -1,10 +1,12 @@
-# Data — never commit raw or large processed files; we track dictionaries + provenance
+# Data: nunca commiteamos los datos crudos (son grandes y los podemos re-descargar
+# con el notebook 0.0 desde las URLs en references/data_provenance.md).
+# Los datos limpios en data/processed/ SÍ los commiteamos (son los outputs de
+# reproducibilidad).
+# data/external/ se commitea solo si los archivos son pequeños (< 5 MB cada uno).
 /data/raw/
-/data/external/
-/data/processed/
-/data/interim/*.parquet
-/data/interim/*.csv
-/data/interim/*.feather
+
+# data/interim/yrbs/*.parquet: sí commiteamos (10 archivos, ~1MB c/u = 10MB total)
+# data/interim/cdc/, etc.: no se commitea por defecto
 
 # Mac OS-specific storage files
 .DS_Store
