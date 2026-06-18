@@ -36,7 +36,12 @@ import sys
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from wired_apart import config
+from wired_apart import config, force_utf8_stdout
+
+# Reconfigurar stdout/stderr a UTF-8 para que caracteres como í, ñ,
+# á, ó se impriman correctamente en Windows. Ver
+# wired_apart.force_utf8_stdout para detalles.
+force_utf8_stdout()
 
 # El notebook 0.0 usa pyodbc + Microsoft Access Driver, que solo está
 # disponible en Windows. En Linux/macOS, los .mdb no se pueden convertir,

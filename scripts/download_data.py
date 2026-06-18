@@ -36,8 +36,15 @@ import requests
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from wired_apart import config
+from wired_apart import config, force_utf8_stdout
 from wired_apart.dataset import sha256_of
+
+# Reconfigurar stdout/stderr a UTF-8 para que ✓, í, … se impriman
+# correctamente en Windows (cuyo code page por defecto es cp1252/
+# charmap, incapaz de representar estos caracteres). Sin esto, el
+# primer `[✓   ] SHA-256 verificado` lanza UnicodeEncodeError y el
+# script muere. Ver wired_apart.force_utf8_stdout para detalles.
+force_utf8_stdout()
 
 # Catálogo de URLs de YRBS. Mantenido en sincronía con
 # references/data_provenance.md (esos SHA-256 son los "ground truth" que

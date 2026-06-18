@@ -15,8 +15,12 @@ sys.path.insert(0, str(PROJECT_ROOT))
 import numpy as np
 import pandas as pd
 
-from wired_apart import config
+from wired_apart import config, force_utf8_stdout
 from wired_apart.dataset import YRBS_QCODE_CROSSWALK
+
+# Reconfigurar stdout/stderr a UTF-8 para que caracteres como í se
+# impriman correctamente en Windows.
+force_utf8_stdout()
 
 # Cargar el stacked raw (no requiere ODBC)
 raw = pd.read_parquet(config.PROCESSED_DIR / "yrbs_2005_2021.parquet")

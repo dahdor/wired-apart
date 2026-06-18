@@ -38,7 +38,11 @@ sys.path.insert(0, str(PROJECT_ROOT))
 import numpy as np
 import pandas as pd
 
-from wired_apart import config
+from wired_apart import config, force_utf8_stdout
+
+# Reconfigurar stdout/stderr a UTF-8 para que caracteres como í se
+# impriman correctamente en Windows.
+force_utf8_stdout()
 
 # Mapeo de 2005 (8-cat → binario) según YRBS 2005 codebook
 HISPANIC_2005_MAP = {
