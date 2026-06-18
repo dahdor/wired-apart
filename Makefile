@@ -4,7 +4,7 @@
 
 PROJECT_NAME = wired-apart
 PYTHON_VERSION = 3.12
-PYTHON_INTERPRETER = python
+PYTHON_INTERPRETER = python3
 QUARTO = quarto
 
 #################################################################################
@@ -27,6 +27,28 @@ sync:
 .PHONY: add
 add:
 	uv add $(PKG)
+
+## Download raw data (YRBS .mdb from CDC + NCHS Socrata)
+## Idempotent: skips files that exist and match expected SHA-256.
+.PHONY: download
+download:
+	uv run python scripts/download_data.py
+
+## Download only Socrata (NCHS mortality) — for when YRBS is already local.
+.PHONY: download-socrata
+download-socrata:
+	uv run python scripts/download_data.py --socrata-only
+
+## Validate end-to-end: download → pipeline → report → tests.
+## Use this for CI and for sanity-checking after big changes.
+.PHONY: validate
+validate:
+	uv run python scripts/validate_pipeline.py
+
+## Quick validation: just tests + check outputs exist (skip pipeline).
+.PHONY: validate-quick
+validate-quick:
+	uv run python scripts/validate_pipeline.py --quick
 
 ## Remove compiled Python files
 .PHONY: clean

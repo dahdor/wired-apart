@@ -124,6 +124,9 @@ make report        # renderiza el informe a HTML y PDF
 make clean         # borra pyc, __pycache__, .ipynb_checkpoints
 make lint          # ruff check + format check
 make format        # auto-format con ruff
+make download      # descarga YRBS .mdb y NCHS Socrata (idempotente)
+make test          # 27 tests pytest (integridad, anti-regresión)
+make validate      # download + pipeline + report + tests + check outputs (todo en uno)
 ```
 
 ### Pasos sin `make` (equivalentes portables para Windows/macOS)
@@ -162,6 +165,57 @@ uv run quarto render informe.qmd --to pdf
 ```
 
 Los outputs se guardan en `reports/informe.html` y `reports/informe.pdf`.
+
+---
+
+## Reproducibilidad
+
+El proyecto está diseñado para que un clon fresco pueda regenerar **todos** los outputs (datos limpios, figuras, informe HTML+PDF) sin intervención manual.
+
+### Flujo de un solo comando
+
+```bash
+# Clonar, instalar, descargar, ejecutar pipeline, renderizar, validar.
+git clone https://github.com/dahdor/wired-apart.git
+cd wired-apart
+make install      # uv sync --all-extras (crea .venv, instala deps)
+make download     # descarga YRBS .mdb de CDC y NCHS Socrata
+make pipeline     # ejecuta los 8 notebooks en orden
+make report       # renderiza informe.qmd a HTML y PDF
+make test         # corre pytest con 27 tests anti-regresión
+make validate     # todo lo anterior + verificación de outputs
+```
+
+En Windows, `make download` se salta la conversión de YRBS .mdb a Parquet (requiere Microsoft Access ODBC) y usa el stacked raw ya commiteado en `data/processed/yrbs_2005_2021.parquet`.
+
+### Componentes de reproducibilidad
+
+| Componente | Ubicación | Propósito |
+|---|---|---|
+| **`uv.lock`** | raíz | Versiones exactas de todas las dependencias (118 paquetes). |
+| **`scripts/download_data.py`** | scripts/ | Descarga YRBS .mdb + NCHS Socrata, verifica SHA-256. Idempotente. |
+| **`scripts/validate_pipeline.py`** | scripts/ | Ejecuta download → pipeline → report → tests → check outputs. Detecta plataforma para saltar pasos Windows-only. |
+| **`scripts/fix_attempted_suicide.py`** | scripts/ | Reproduce la corrección del bug #1 del CHANGELOG sin necesidad de ODBC. |
+| **`tests/`** | tests/ | 27 tests pytest: integridad de schema, codificación, anti-regresión de headlines, funciones puras. |
+| **`.github/workflows/ci.yml`** | .github/workflows/ | CI en Linux y Windows: ejecuta `validate_pipeline.py` end-to-end, sube HTML y PDF como artifacts. |
+| **`CHANGELOG.md`** | raíz | Historial de correcciones con impacto y archivos modificados. |
+| **`references/data_provenance.md`** | references/ | SHA-256 de cada archivo crudo YRBS + URLs + cobertura. |
+| **`data/processed/yrbs_2005_2021.parquet`** | data/processed/ | Stacked raw commiteado (6.2 MB). Permite correr notebooks 1.0–5.0 sin ODBC. |
+| **`data/external/*.pdf`** | data/external/ | PDFs de referencia (NCHS HUS 2018 Table 9, DB 471) commiteados. |
+
+### Garantías
+
+- **Determinismo:** seeds explícitos en `config.RANDOM_SEED`; los notebooks no usan procesos estocásticos reales (todas las estadísticas son ponderadas o deterministas).
+- **Idempotencia:** `download_data.py` salta archivos ya verificados por SHA-256; `validate_pipeline.py` puede correr múltiples veces sin side effects.
+- **Auditabilidad:** 27 tests pytest detectan cambios accidentales (e.g., el bug #1 de `attempted_suicide_yesno` tiene un test anti-regresión dedicado que compara con tasas oficiales del CDC).
+- **Plataforma:** CI corre en Linux (ubuntu) y Windows; el script `validate_pipeline.py` detecta la plataforma y salta pasos no aplicables.
+
+### Limitaciones honestas de la reproducibilidad
+
+- **Notebook 0.0 (adquisición YRBS .mdb) requiere Windows + Microsoft Access ODBC driver.** En Linux/macOS, los .mdb se descargan pero no se pueden convertir. El stacked raw parquet commiteado resuelve esto.
+- **NCHS HUS 2018 Table 9** se extrae manualmente del PDF (12 valores para 2010, 2016, 2017). El PDF está commiteado en `data/external/` pero los valores extraídos están hardcodeados en el notebook 1.1.
+- **NCHS Data Brief 471** (figura con mortalidad agregada ambos sexos 7.5→12.0/100k) es lectura humana del PDF; los valores no se computan del pipeline automatizado.
+- **Quirk de Quarto 1.9:** con `output-dir: reports` en `_quarto.yml`, los outputs a veces se crean en la raíz. Workaround: pasar `--output-dir reports` explícito (lo hace el script validate).
 
 ---
 

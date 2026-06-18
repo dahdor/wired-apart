@@ -1,0 +1,121 @@
+name: CI
+
+# CI del proyecto Wired Apart.
+#
+# Verifica la reproducibilidad end-to-end en Linux y Windows (matriz).
+# Pasos:
+#   1. Setup Python 3.12 + uv + Quarto
+#   2. Instala dependencias (uv sync)
+#   3. Descarga los datos crudos (YRBS .mdb + NCHS Socrata)
+#   4. Ejecuta el pipeline (los 8 notebooks en orden)
+#   5. Renderiza el informe (HTML + PDF)
+#   6. Corre los tests (pytest)
+#   7. Verifica que los outputs clave existen y pasan los checks estadísticos
+#
+# Si cualquier paso falla, el CI marca ❌ y notifica al autor.
+# Ver `scripts/validate_pipeline.py` para la lógica detallada.
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+# Cancelar ejecuciones redundantes de la misma rama.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validar pipeline (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    env:
+      PYTHON_VERSION: "3.12"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+        shell: bash
+
+      - name: Install Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          tinytex: true
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache uv
+        uses: actions/cache@v4
+        with:
+          path: |
+            .venv
+            ~/Library/Caches/uv
+            ~/.cache/uv
+          key: uv-${{ runner.os }}-${{ matrix.os }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}
+          restore-keys: |
+            uv-${{ runner.os }}-${{ matrix.os }}-
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+        shell: bash
+
+      - name: Verify YRBS Q-codes crosswalk (sin red, debe pasar)
+        run: uv run pytest tests/test_data_integrity.py -v -k "crosswalk"
+        shell: bash
+
+      - name: Download YRBS + NCHS Socrata
+        run: uv run python scripts/download_data.py
+        shell: bash
+        # Windows + uv: descargar el .zip en lugar de .mdb requiere confirmación
+        # (algunos navegadores marcan los .mdb como "no estándar").
+        # El script download_data.py usa requests, no navegador.
+
+      - name: Run end-to-end validation
+        # El script detecta plataforma: en Windows corre los 8 notebooks; en
+        # Linux/macOS se salta el 0.0 (que requiere Microsoft Access ODBC).
+        # El stacked raw parquet ya está commiteado, así que los demás
+        # notebooks funcionan sin ODBC.
+        run: uv run python scripts/validate_pipeline.py
+        shell: bash
+
+      - name: Render report (HTML + PDF)
+        run: |
+          uv run quarto render informe.qmd --to html --output-dir reports
+          uv run quarto render informe.qmd --to pdf --output-dir reports
+        shell: bash
+
+      - name: Verify outputs (anti-regression)
+        run: uv run python scripts/validate_pipeline.py --quick
+        shell: bash
+
+      - name: Upload informe.html (artifact)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: informe-html-${{ matrix.os }}
+          path: reports/informe.html
+          retention-days: 30
+
+      - name: Upload informe.pdf (artifact)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: informe-pdf-${{ matrix.os }}
+          path: reports/informe.pdf
+          retention-days: 30

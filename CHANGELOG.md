@@ -219,6 +219,37 @@ Auditoría completa del proyecto por revisión externa. Se identificaron **20 ha
 
 ---
 
+## [2026-06-18] — Reproducibilidad end-to-end (CI + tests + download script)
+
+El proyecto pasa de "documentado pero con piezas manuales" a "clon-fresco → outputs listos con un comando". Adiciones:
+
+### Nuevos archivos
+- **`scripts/download_data.py`** (~230 líneas): descarga automatizada de los 9 años de YRBS .mdb desde CDC y del Socrata de NCHS. Verifica SHA-256 contra el catálogo en `references/data_provenance.md`. Idempotente. CLI: `--year`, `--force`, `--socrata-only`, `--yrbs-only`.
+- **`scripts/validate_pipeline.py`** (~200 líneas): ejecutor end-to-end (download → notebooks → report → tests → check outputs). Detecta plataforma: en Linux/macOS salta notebook 0.0 (que requiere Microsoft Access ODBC). CLI: `--quick`, `--skip-download`, `--skip-render`.
+- **`tests/conftest.py`** (3 fixtures): `yrbs_clean`, `yrbs_raw`, `wonder` con `scope="session"` para amortiguar la carga.
+- **`tests/test_data_integrity.py`** (22 tests): integridad de schema, codificación, anti-regresión del bug #1 (attempted_suicide_yesno invertido), anti-regresión de headlines del README (sad_hopeless 28.5%→42.3%, gap F-M 16.4pp→28.0pp), validez del crosswalk Q-codes, funciones puras de `features.py`.
+- **`tests/test_plots.py`** (4 tests): `apply_project_style`, `save`, `highlight_period`.
+- **`.github/workflows/ci.yml`**: CI en matriz Linux + Windows. Pasos: checkout → Python 3.12 → uv → Quarto+TinyTeX → cache uv → `uv sync --all-extras` → `validate_pipeline.py` → render report → `validate_pipeline.py --quick` → upload HTML+PDF como artifacts.
+
+### Archivos modificados
+- **`Makefile`**: nuevos targets `download`, `download-socrata`, `validate`, `validate-quick`. Cambiado `PYTHON_INTERPRETER = python` → `python3` (corrige `make help` en sistemas sin `python`).
+- **`README.md`**: nueva sección "## Reproducibilidad" con tabla de componentes, flujo de un solo comando, garantías, y limitaciones honestas. Ampliada la sección "Cómo reproducir el análisis" con los nuevos `make` targets.
+- **`pyproject.toml`** (sin cambios): pytest ya estaba configurado en `tool.pytest.ini_options`, solo faltaba crear el directorio `tests/`.
+
+### Estado verificado
+- 27 tests pytest pasan (4.12s): cobertura de schema, codificación, anti-regresión, funciones puras, plots.
+- `make help` lista 15 reglas.
+- `make test` corre la suite.
+- `uv run python scripts/download_data.py --year 2019` descarga yrbs2019.zip (2.1 MB), extrae yrbs2019.mdb (25.8 MB) y verifica SHA-256 (`beae21384679…`).
+- `uv run python scripts/validate_pipeline.py --quick` valida outputs en <2s.
+
+### Limitaciones reconocidas
+- **CI en Windows:** el notebook 0.0 (ODBC) requiere Microsoft Access driver; en Windows-GitHub-Actions es no-trivial de instalar. El CI en Windows ejecuta la rama 1.0–5.0 contra el stacked raw commiteado. La rama Linux hace lo mismo (más representativo del flujo real).
+- **Quarto 1.9 quirk:** `output-dir: reports` se interpreta como `./` en lugar de `./reports` al ejecutar desde la raíz. Workaround: `--output-dir reports` explícito (lo hace `validate_pipeline.py` y el README lo documenta).
+- **YRBS .mdb en Linux:** se descargan pero no se pueden convertir. El stacked raw parquet commiteado (6.2 MB) resuelve esta dependencia.
+
+---
+
 ## [2026-06-18] — Regeneración del informe (HTML + PDF)
 
 - `reports/informe.html` y `reports/informe.pdf` regenerados con Quarto 1.9.0 + TinyTeX para incorporar las correcciones de este CHANGELOG (forma de J, aceleración post-2015, bug de `attempted_suicide_yesno` documentado, chi-cuadrado con conteos crudos, etc.).
