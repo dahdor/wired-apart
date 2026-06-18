@@ -102,6 +102,32 @@ _Last updated: 2026-06-18 00:38:00 UTC_
 **Coverage retrieved:** 2018-2024 (subset; full coverage in source)
 **Filter applied:** `topic='Suicides' AND ` + BT + `group` + BT + `='Sex and age group'` (crude rate filtered in pandas)
 **Retrieved at:** 2026-06-18 00:38:00 UTC
-**Output:** `data/processed/wonder_suicide_adolescent_2018_2024.csv`
+**Output:** `data/processed/wonder_suicide_adolescent_2018_2024.csv` (28 rows)
+**SHA-256:** `9d93f45224c30b02e0aa4d25685e8b9150a274be1417b613da511fa0ccca6f03` (wonder_clean_2005_2024.csv, after augmentation)
 
-**Pendiente (Fase 3):** descargar 2005-2017 desde WONDER UI o NCHS Data Briefs para tener la serie completa pre/post Great Rewiring.
+## NCHS Health, United States 2018, Table 9 (PDF)
+
+**URL:** https://www.cdc.gov/nchs/data/hus/2018/009.pdf
+**Format:** PDF (tabla de tasas crudas por 100k, muertes por suicidio, por sexo, edad y año)
+**Local path:** `data/external/hus2018_table9.pdf`
+**SHA-256:** `646ffd4a1354b7c959ae1651ebb03d80dcd44fc02ec488464007ca5fd46dac05`
+**Coverage extracted:** 2010, 2016, 2017 (4 grupos demográficos c/u = 12 filas)
+**License:** Public domain (US Government work)
+**Uso:** extender la serie de mortalidad hacia atrás de 2018 (límite de Socrata) a 2010.
+
+## NCHS Data Brief 471 (PDF)
+
+**URL:** https://www.cdc.gov/nchs/data/databriefs/db471.pdf
+**Format:** PDF (Data Brief sobre suicidio y homicidio en 10-24 años, 2001-2021)
+**Local path:** `data/external/db471.pdf`
+**SHA-256:** `a8948f5da31f600cd000f44465b4884622b42076009ba9311af85f11a5486e0e`
+**Uso:** referencia cualitativa (describe tendencias), no extracción de datos primarios.
+
+## Limitación de cobertura 2005-2009 y 2011-2015
+
+El CDC WONDER API (D76, D77, D158, D176) **rechaza todas las queries programáticas** con HTTP 400 "intermittent error" desde este entorno, lo que impide la automatización de la descarga 2005-2017.
+
+**Workaround aplicado:** combinación de NCHS Socrata (2018-2024) + HUS 2018 Table 9 (2010, 2016, 2017).
+**Gap restante:** 2005-2009 y 2011-2015. Documentado en el informe (sección Limitaciones) con interpolación explícita entre puntos disponibles (línea punteada en el gráfico de tendencia).
+
+**Output limpio:** `data/processed/wonder_clean_2005_2024.csv` (40 filas: 12 HUS + 28 Socrata, 9 columnas).
