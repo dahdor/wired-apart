@@ -1,7 +1,9 @@
 /* styles.css — Custom CSS for the Wired Apart report
- * Forces serif font across ALL elements (headings + body text + nav + code).
+ * Forces serif font across ALL elements (headings + body text + nav).
  * Diego prefers the serif font (Georgia/Times) — it matches the academic register.
  * Bootstrap default uses sans-serif for everything; we override with !important.
+ * Note: we do NOT force font-weight — let Bootstrap decide. h1-h6 are 500/600
+ * (medium/semibold) by default which is readable and not "shouty" bold.
  */
 
 html, body {
@@ -16,13 +18,13 @@ label, .form-control, .form-label {
   font-family: Georgia, "Times New Roman", serif !important;
 }
 
+/* Headings: serif pero sin forzar bold (dejamos el default del theme) */
 h1, h2, h3, h4, h5, h6,
 .title, .subtitle, .author, .date,
 .quarto-title, .quarto-title-block,
 nav.toc, .sidebar-navigation,
 .navbar, .nav-link, .navbar-brand {
   font-family: Georgia, "Times New Roman", serif !important;
-  font-weight: bold;
 }
 
 /* TOC and other Quarto elements */
