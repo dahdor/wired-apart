@@ -325,7 +325,7 @@ Todo lo que se necesita para entender el proyecto está en este repositorio.
 - **Autor:** Diego Hernández — C.I. 31.045.867
 - **Materia:** Análisis de Datos — FPTSP27 — Sección 1
 - **Institución:** Universidad Metropolitana — Facultad de Ingeniería — Departamento de Gestión de Proyectos y Sistemas
-- **Período académico:** 2026-2 (segundo semestre 2026)
+- **Período académico:** 2526-3 (tercer trimestre 2025-2026)
 
 ---
 

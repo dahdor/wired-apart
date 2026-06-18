@@ -5,7 +5,7 @@ project:
   type: default
   title: "Wired Apart"
 
-# Bibliografía (BibTeX exportado a partir del .bib del libro)
+# Bibliografía (BibTeX)
 bibliography: references/references.bib
 csl: references/apa.csl
 
@@ -30,17 +30,12 @@ format:
     documentclass: scrartcl
     papersize: letter
     toc: true
-    # El TOC va en su propia página, antes y después del contenido
-    toc-title-page: true
-    # Forzar salto de página después del TOC
-    include-after-body:
-      text: |
-        \clearpage
+    # El TOC comparte espacio con el resto del front matter (abstract, etc.)
+    # Diego prefiere que el TOC no esté en una página aislada.
     number-sections: true
     fig-width: 7
     fig-height: 4.5
     fig-dpi: 200
-    # mainfont = lmodern por default; con scrartcl ya es serif coherente
     include-in-header:
       text: |
         \usepackage{fancyhdr}
@@ -48,12 +43,8 @@ format:
         \fancyhead[L]{\small Wired Apart}
         \fancyhead[R]{\small Diego Hernández}
         \fancyfoot[C]{\thepage}
-        % Forzar página propia para el TOC: salto antes del abstract
-        \usepackage{etoolbox}
-        \AtBeginDocument{\let\origmaketitle\maketitle
-          \renewcommand{\maketitle}{\origmaketitle\clearpage}}
 
-# Ejecución: ocultamos el código en el HTML por defecto (se puede expandir con los code-tools)
+# Ejecución: ocultamos el código en el HTML por defecto
 execute:
   echo: false
   warning: false
@@ -62,9 +53,3 @@ execute:
 
 # Directorio de salida
 output-dir: reports
-
-# Recursos (figuras auxiliares, logo)
-# NOTA: el path es relativo al directorio de salida (reports/).
-# Por eso listamos `logo-unimet.png` aquí, no `reports/logo-unimet.png`.
-resources:
-  - logo-unimet.png

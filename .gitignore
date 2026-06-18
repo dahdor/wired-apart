@@ -5,8 +5,10 @@
 # data/external/ se commitea solo si los archivos son pequeños (< 5 MB cada uno).
 /data/raw/
 
-# data/interim/yrbs/*.parquet: sí commiteamos (10 archivos, ~1MB c/u = 10MB total)
-# data/interim/cdc/, etc.: no se commitea por defecto
+# data/interim/yrbs/*.parquet: NO commiteamos — se regeneran ejecutando
+# el notebook 0.0-dh-data-acquisition.ipynb. El stacked final está en
+# data/processed/yrbs_2005_2021.parquet.
+/data/interim/yrbs/
 
 # Mac OS-specific storage files
 .DS_Store
@@ -195,3 +197,12 @@ cython_debug/
 .pypirc
 /.quarto/
 **/*.quarto_ipynb
+**/*.tex
+**/*.aux
+**/*.log
+**/*.toc
+**/*.out
+
+# Documentos vivos (no son parte del entregable academico)
+handoff.md
+/logo-unimet.png

@@ -2,7 +2,8 @@
 title: "Wired Apart"
 subtitle: "Cuantificando el coste de la childhood digital sobre el bienestar adolescente (EE.UU., 2005–2021)"
 author: "Diego Hernández"
-date: today
+date: "2026-06-17"
+date-format: long
 abstract: |
   Este informe replica y extiende los hallazgos de *The Anxious Generation* [-@haidt2024anxious] sobre
   el deterioro del bienestar adolescente tras la "Gran Reconexión" digital (2010-2015). Usando
@@ -20,15 +21,11 @@ abstract: |
   especialmente en mujeres. Proponemos un framework operacional *Phone-Free Schools* con
   4 palancas y 5 KPIs SMART, evaluable mediante un RCT cluster-aleatorizado
   (n = 3 000, 2 años, USD 210/est/año).
-
-  **Repositorio y reproducibilidad:** el código completo, los datos limpios y los
-  notebooks están disponibles en <https://github.com/dahdor/wired-apart>.
 keywords: [adolescent mental health, smartphone, social media, YRBS, NCHS, data storytelling,
            Phone-Free Schools, Cochran-Armitage, regression, public health]
 title-block-banner: true
 include-before-body:
   text: |
-    <p align="center"><img src="logo-unimet.png" width="200"/></p>
 lang: es
 ---
 
@@ -429,6 +426,8 @@ ROI estimado: 3-5x en costos evitados de salud mental [-@lee2022roi].
 Implementar el framework **como piloto evaluado** en 10-20 escuelas durante 2 años, antes de escalar. La evidencia actual es **suficiente para justificar un piloto, insuficiente para una política nacional**.
 
 # 9. Reproducibilidad
+
+**Repositorio y reproducibilidad:** el código completo, los datos limpios y los notebooks de este informe están disponibles públicamente en <https://github.com/dahdor/wired-apart>. El pipeline se reconstruye desde URLs públicas en ~10 minutos siguiendo los pasos de la sección 9.2.
 
 ## 9.1 Estructura del repositorio
 
