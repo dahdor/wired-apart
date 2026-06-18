@@ -7,14 +7,15 @@
 
 ## 1. TL;DR del proyecto
 
-- **Repo:** `https://github.com/dahdor/wired-apart` (local en `C:/Users/dahdor/workspace/projects/ad/wired-apart`)
+- **Repo público:** `https://github.com/dahdor/wired-apart` (creado con `gh repo create --public --push`)
+- **Local:** `C:/Users/dahdor/workspace/projects/ad/wired-apart`
 - **Estudiante:** Diego Hernández — C.I. 31.045.867 — Unimet, FPTSP27, sección 1, Fac. Ingeniería, Dep. Gestión de Proyectos y Sistemas
 - **Tema:** "Wired Apart" — cuantificar la asociación entre la transición a la "phone-based childhood" (2010-2015) y el deterioro del bienestar adolescente en EE.UU. (2005-2021)
 - **Pregunta de investigación:** ¿En qué magnitud y con qué rapidez la transición a una infancia basada en el teléfono se asocia con el deterioro de indicadores de bienestar adolescente, y qué marco de monitoreo e intervención digital permite medir y revertir ese efecto en entornos escolares?
 - **Plan completo** en `.agents/plans/plan-proyecto-ad.md` (10 fases)
-- **Estado actual (junio 2026):** Fases 0-3 completas, Fase 4 parcial. **Limpieza hecha para YRBS y WONDER. 5 figuras narradas listas.**
+- **Estado actual (junio 2026):** Fases 0-9 completas. 16 commits pusheados a GitHub. **Proyecto listo para revisión y entrega.**
 
-## 2. Commits del proyecto (8)
+## 2. Commits del proyecto (16)
 
 | Hash | Mensaje | Qué hace |
 |---|---|---|
@@ -26,6 +27,14 @@
 | `7a203a0` | feat(cleaning): WONDER 1.1 | Notebook 1.1 con augmentación HUS 2018. Output: `wonder_clean_2005_2024.csv` |
 | `f1d8ebe` | chore(gitignore): track cleaned outputs | Acepta data/processed y data/external en git |
 | `3cbdd52` | feat(eda): YRBS EDA 2.0 | 5 figuras narradas en reports/figures/ |
+| `f5c9870` | docs(handoff): update for post-compression | Segundo handoff con más contexto |
+| `03875aa` | feat(eda): WONDER EDA 2.1 | 4 figuras mortalidad |
+| `27753fc` | feat(analysis): main statistical analysis 3.0 | 7 tests + 2 figuras |
+| `5259aad` | docs(handoff): race column bug + jupyter quirk | Documenta el bug |
+| `fdc1cab` | feat(storytelling): 3 figuras 4.0 | Outliers, zoom-out, correlaciones |
+| `5ef8bd0` | feat(solution): Phone-Free Schools 5.0 | Framework operacional con 4 palancas y 5 KPIs |
+| `bbfb9f7` | feat(informe): complete Quarto report | 9 secciones, 24p PDF + 5.5MB HTML |
+| `fb3b1fd` | docs(readme): update with real findings | README con números reales |
 
 ## 3. Datasets finales (después de limpieza)
 
@@ -222,61 +231,38 @@ Crucé `p1/correcciones.md` y `prac1/correcciones.md`. Patrones que importan:
 
 ## 11. Plan de las próximas fases
 
-### Fase 4 (continuar)
-- [x] 2.0-dh-eda-yrbs.ipynb (5 figuras)
-- [ ] 2.1-dh-eda-wonder.ipynb (mortalidad, 2-3 figuras con interpolación explícita del gap)
+**TODAS LAS FASES COMPLETADAS.** Ver tabla de commits arriba. **El proyecto está listo para revisión.**
 
-### Fase 5 — Análisis principal
-- [ ] 3.0-dh-analysis.ipynb:
-  - Correlaciones Pearson/Spearman entre outcomes
-  - Paradoja de Simpson: análisis por subgrupos (sexo × grado × raza)
-  - Regresión logística: P(sad_hopeless) ~ year + sex + age + screen_time
-  - Análisis de sensibilidad con/sin pesos muestrales
-  - Test de tendencias (Cochran-Armitage)
-  - Comparación con mortalidad (2018-2024)
+## 11.1 Tareas restantes (post-entrega)
 
-### Fase 6 — Storytelling
-- [ ] 4.0-dh-storytelling.ipynb:
-  - 2-3 figuras adicionales con las 7 plantillas Dawson C9
-  - Outliers: ¿qué adolescentes están MEJOR que la tendencia? (zoom-in)
-  - Zoom-out: comparación con NCHS mortality
+Diego dijo "Carolina no hará correcciones del proyecto antes de entregar: debes hacer las revisiones tú. Así que crea el repositorio, actualiza el handoff y procederé a comprimir la conversación para hacer la revisión de todo." (junio 2026).
 
-### Fase 7 — Solución de ingeniería
-- [ ] 5.0-dh-solution.ipynb:
-  - Framework "Phone-Free Schools" con métricas SMART
-  - Definición operacional de variables
-  - Diseño de A/B test con power analysis
-  - Costos estimados
+**Checklist de auto-revisión para Diego al descomprimir:**
 
-### Fase 8 — README final
-- [ ] Reemplazar placeholders con datos reales del análisis
-- [ ] Badges, screenshots, etc.
-
-### Fase 9 — Informe Quarto
-- [ ] Rellenar `informe.qmd` con las 9 secciones
-- [ ] Incrustar las 5+ figuras
-- [ ] Bibliografía
-
-### Fase 10 — Polish contra correcciones de Carolina
-- [ ] Releer p1 y prac1 correcciones
-- [ ] Verificar orden metodológico, justificación de cada transformación
-- [ ] Verificar objetivos SMART con métricas
+1. [ ] Releer este handoff (5 min) para refrescar el contexto.
+2. [ ] Verificar que la URL del repo esté accesible: `https://github.com/dahdor/wired-apart`.
+3. [ ] Abrir `reports/informe.html` o `reports/informe.pdf` y leer el informe completo (24 páginas).
+4. [ ] Releer `p1/correcciones.md` y `prac1/correcciones.md` para recordar el estilo de Carolina.
+5. [ ] Re-ejecutar el pipeline (`make data clean eda analyze` o uv run equivalents) para confirmar reproducibilidad.
+6. [ ] Decidir si el bug de la columna `race` (Sección 9.4) se corrige o se documenta como limitación.
+7. [ ] Verificar que las 14 figuras se ven correctamente en el informe.
+8. [ ] Verificar que el README y la descripción del repo en GitHub están sincronizados.
 
 ## 12. Cómo retomar el trabajo
 
 ```bash
 cd C:/Users/dahdor/workspace/projects/ad/wired-apart
+# El remote ya está configurado y pusheado
 git status                    # working tree clean
-git log --oneline            # ver los 8 commits
-ls data/processed/            # verificar yrbs_clean + wonder_clean
-ls reports/figures/           # verificar 5 figuras
+git log --oneline            # ver los 16 commits
+git remote -v                # origin = https://github.com/dahdor/wired-apart.git
 
 # Re-ejecutar pipeline (opcional, ya está commiteado)
 uv sync --all-extras
-PYTHONIOENCODING=utf-8 uv run --with jupyter --with pandas --with pyarrow \
-  jupyter execute notebooks/2.0-dh-eda-yrbs.ipynb
+make pipeline                # o uv run equivalents
 
-# Empezar Fase 4 continuación: 2.1 EDA WONDER
+# Push cambios futuros
+git add -A && git commit -m "..." && git push
 ```
 
 ## 13. Referencias rápidas en el repo
@@ -290,26 +276,28 @@ PYTHONIOENCODING=utf-8 uv run --with jupyter --with pandas --with pyarrow \
 
 ## 14. TL;DR ejecutivo
 
-**Lo que tenemos:**
-- 8 commits limpios
-- 134,674 registros YRBS limpios (9 años)
-- 40 filas de mortalidad adolescente limpia (10 años con gaps)
-- 5 figuras narradas de alta calidad (incluyendo la del gap de género amplificándose)
-- Crosswalk validado de Q-codes
-- Limitaciones documentadas honestamente
-
-**Lo que falta:**
-- EDA WONDER (Fase 4 continuación)
-- Análisis principal con regresiones (Fase 5)
-- Storytelling adicional (Fase 6)
-- Solución Phone-Free Schools (Fase 7)
-- Rellenar informe.qmd (Fase 9)
+**Estado final del proyecto (junio 2026):**
+- **Repo público:** https://github.com/dahdor/wired-apart
+- **16 commits** limpios, pusheados
+- **8 notebooks** del pipeline (0.0 → 5.0) ejecutados
+- **14 figuras** narradas en `reports/figures/`
+- **Informe técnico:** `reports/informe.html` (5.5 MB) y `reports/informe.pdf` (24 páginas)
+- **README** con hallazgos reales y framework
+- **handoff.md** con contexto vivo
 
 **Historia del proyecto:** El aumento de sad/hopeless en mujeres adolescentes de 36% (2005) a 56% (2021) coincide con la "phone-based childhood" teorizada por Haidt. El gap de género se amplió de 16pp a 27.6pp, consistente con la hipótesis del libro de que las plataformas image-based (Instagram, TikTok) afectan desproporcionadamente a las mujeres.
 
-**Decisiones pendientes con Diego:**
-- ¿Cómo presentar el gap 2005-2017 de mortalidad en el informe? (gráfico con interpolación punteada, o tabla con "data not available" explícito)
-- ¿Vale la pena un análisis más profundo del COVID叠加 (2019-2021) o quedarnos con la narrativa pre/post?
-- ¿El framework Phone-Free Schools debe ser específico (recoger celulares en la puerta) o sistémico (política estatal)?
+**Cifras clave del informe:**
+- sad/hopeless 28.6% (2005) → 41.5% (2021) = +43%
+- Mujeres: 36.4% → 55.6% = +53%
+- Gap F-M: 16.3pp → 27.6pp (×1.7)
+- OR year 2021/2005 = 1.93 (IC95 1.84-2.03)
+- OR screen 5+h vs no-uso = 2.14 (IC95 1.90-2.41)
+- Mortalidad 15-19: 7.5 → 12.0/100k (+60%) entre 2010-2018
 
-**Siguiente paso concreto:** Construir 2.1-dh-eda-wonder.ipynb con la tendencia de mortalidad 2010-2024 (con gaps explícitos como línea punteada). Después 3.0 con la regresión principal.
+**Decisiones pendientes con Diego:**
+- (Resueltas) Cómo presentar el gap 2005-2017 de mortalidad → interpolación punteada + 3 puntos HUS 2018.
+- (Resuelta) Análisis COVID叠加 → sí, documentado como aceleración 2019-2021.
+- (Resuelto) Framework específico vs sistémico → específico (lockers magnéticos + 3 palancas más), evaluable como piloto.
+
+**Pendiente menor:** bug de columna `race` (height en lugar de raza) documentado en §9.4. Workaround con `hispanic` aplicado.
