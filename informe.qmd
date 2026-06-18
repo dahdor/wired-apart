@@ -15,12 +15,13 @@ abstract: |
   (36.7% → 56.6%, +54%). La regresión logística con pesos muestrales (n = 131 936) muestra
   un OR de 1.93 (IC95 1.84-2.03) para 2021 vs 2005, controlando por sexo y edad. En 2019, los
   estudiantes que reportan 5+ horas diarias de pantalla (incluyendo social media) tienen 2.14x
-  el odds de depresión (IC95 1.90-2.41) vs los que no usan pantalla. La mortalidad completed
-  por suicidio adolescente en 15-19 años cambió de régimen en 2010-2018: de 7.5/100k a
-  12.0/100k (+60%) [@nchsdb471]. La mortalidad no captura la carga de salud mental,
-  especialmente en mujeres. Proponemos un framework operacional *Phone-Free Schools* con
-  4 palancas y 5 KPIs SMART, evaluable mediante un RCT cluster-aleatorizado
-  (n = 3 000, 2 años, USD 210/est/año).
+  el odds de depresión (IC95 1.90-2.41) vs los que no usan pantalla; la curva sigue una
+  **forma de J** (mínimo en 1h/día, OR=0.95). La mortalidad completed por suicidio adolescente
+  en 15-19 años pasó de 7.5/100k (2010) a 12.0/100k (2018) (+60%) [@nchsdb471], con
+  aceleración post-2015, no durante la ventana rewiring. La mortalidad no captura la carga
+  de salud mental, especialmente en mujeres. Proponemos un framework operacional
+  *Phone-Free Schools* con 4 palancas y 5 KPIs SMART, evaluable mediante un RCT
+  cluster-aleatorizado (n = 3 000, 2 años, USD 210/est/año).
 keywords: [adolescent mental health, smartphone, social media, YRBS, NCHS, data storytelling,
            Phone-Free Schools, Cochran-Armitage, regression, public health]
 title-block-banner: true
@@ -37,13 +38,13 @@ lang: es
 
 **Hallazgos principales.**
 
-1. **Tendencia global:** sad/hopeless autopercibido subió de 28.5% (2005) a 42.3% (2021) — un **aumento de 48%** en 16 años. El Cochran-Armitage trend test confirma una tendencia lineal monotónica (p < 0.001).
+1. **Tendencia global:** sad/hopeless autopercibido subió de 28.5% (2005) a 42.3% (2021) — un **aumento de 48%** en 16 años. El Cochran-Armitage trend test confirma una tendencia lineal creciente (p < 0.001).
 
 2. **Asimetría de género amplificada:** las mujeres adolescentes pasaron de 36.7% a 56.6% (+19.9pp, +54%); los hombres de 20.4% a 28.6% (+8.2pp, +40%). El gap de género creció de 16.4pp a **28.0pp** (amplificación del 71%).
 
-3. **Dosis-respuesta con screen time (2019):** OR ajustados de 0.95 (1h/día), 1.14 (2h), 1.32 (3h), 1.85 (4h), **2.14 (5+h/día)** vs no-uso. Asociación monotónica estadísticamente significativa.
+3. **Dosis-respuesta con screen time (2019, forma de J):** OR ajustados de 0.95 (1h/día), 1.14 (2h), 1.32 (3h), 1.85 (4h), **2.14 (5+h/día)** vs no-uso. La curva es **decreciente para 0–1h y luego creciente** — el mínimo se observa en 1h/día, y el riesgo se acelera a partir de 3h/día. **No es monotónica** en sentido estricto.
 
-4. **Cambio de régimen 2010-2015:** la mortalidad por suicidio adolescente (15-19) pasó de 7.5/100k (2010) a 12.0/100k (2018), un **+60%** que coincide con la ventana del Great Rewiring.
+4. **Aceleración post-2015, no durante el rewiring:** los datos muestran una subida modesta 2010-2015 (+3.8pp en 6 años, de 26.1% a 29.9%) y la aceleración real es 2017→2021 (+10.8pp en 4 años). La mortalidad por suicidio adolescente (15-19) pasó de 7.5/100k (2010) a 12.0/100k (2018), un **+60%** que **sucede después** de la ventana del Great Rewiring teorizado por Haidt.
 
 5. **Depresión y mortalidad se divorcian:** las mujeres tienen 2x la tasa de depresión que los hombres, pero 1/3 de su mortalidad completed. La mortalidad no captura la carga de salud mental.
 
@@ -135,7 +136,7 @@ Se aplicó la metodología **diagnóstico → decisión → verificación** (ord
 | Q-code crosswalk | Q25 ≠ sad/hopeless en todos los años | Construir crosswalk validado con codebooks | %yes distribution matchea codebook por año |
 | Imposibles | rate < 0, lci > uci, etc. | 0 encontrados | N/A |
 | Duplicados | por (year, q25) | 0 duplicados | N/A |
-| Outliers | 3 std por grupo | 0 outliers | serie monotónica |
+| Outliers | 3 std por grupo | 0 outliers | serie estable |
 | Faltantes | ~2% NaN en outcomes | Análisis complete-case | n=131,936 vs n=134,674 |
 | Output | 134,674 × 15 columnas | `yrbs_clean_2005_2021.parquet` | 2019 = 36.7% matches CDC |
 
@@ -186,7 +187,7 @@ Esta es la firma cuantitativa de la hipótesis de Haidt sobre plataformas *image
 
 ![Screen time](reports/figures/fig5_screen_sad_2019.png){#fig-5}
 
-**Hallazgo.** Asociación monotónica: ~30% sad/hopeless en "no usa" → ~50% en "5+ h/día". Los 5+ h tienen ~1.7x la tasa de no-uso. **Caveat:** transversal, no longitudinal.
+**Hallazgo.** Asociación con **forma de J**, no monotónica: ~33% sad/hopeless en "no usa" y "<1h", mínimo de **28% en 1h**, y subida acelerada a partir de 3h hasta **48% en 5+ h/día**. Los 5+ h tienen ~1.5x la tasa de no-uso, y la OR ajustada (controlando sexo y edad) es 2.14. **Caveat:** transversal, no longitudinal; causalidad inversa posible.
 
 ## 4.6 Mortalidad adolescente 2010-2024
 
@@ -221,7 +222,7 @@ Esto sugiere un **constructo subyacente común** (deterioro de salud mental), no
 | Mujeres | +1.085 | < 0.001 | 0.706 |
 | Hombres | +0.442 | < 0.001 | 0.568 |
 
-**Confirmado:** tendencia lineal monotónica creciente en ambos sexos. La pendiente en mujeres es **2.5x mayor** que en hombres.
+**Confirmado:** tendencia lineal creciente en ambos sexos (p < 0.001). La pendiente en mujeres es **2.5x mayor** que en hombres. La pendiente femenina es +1.085pp/año y la masculina +0.442pp/año, calculadas con 9 puntos anuales. *Limitación:* el Cochran-Armitage no se acompaña de IC95 bootstrap en este informe — la inferencia es direccional, no de magnitud exacta.
 
 ## 5.3 Regresión logística con año
 
@@ -251,7 +252,7 @@ Esto sugiere un **constructo subyacente común** (deterioro de salud mental), no
 | 4h | 1.847 | 1.600-2.134 | *** |
 | **5+h** | **2.137** | **1.896-2.409** | *** |
 
-**Lectura:** dosis-respuesta monotónica. Los 5+h tienen **odds 2.14x mayores** que los no-usuarios. Caveat: transversal, causalidad inversa posible.
+**Lectura:** **dosis-respuesta con forma de J**, no monotónica. La OR para 1h es 0.95 (menor que no-uso), y la aceleración ocurre a partir de 3h. Los 5+h tienen **odds 2.14x mayores** que los no-usuarios. Caveat: transversal, causalidad inversa posible, e IC95 no corrigen por el diseño complejo (cluster PSU) — los valores exactos deben interpretarse con cautela.
 
 ## 5.5 Pre/post Great Rewiring (chi-cuadrado)
 
@@ -260,7 +261,8 @@ Esto sugiere un **constructo subyacente común** (deterioro de salud mental), no
 | Pre (2005-2009) | 27.6% | 43 811 |
 | Post (2017-2021) | 37.1% | 45 003 |
 | **Diferencia** | **+9.5pp** | |
-| Chi² | 918.84 | p < 0.001 |
+| Chi² (conteos no ponderados) | ~580 | p < 0.001 |
+| Chi² (conteos ponderados, referencia) | 918.84 | p < 0.001 |
 | Odds ratio | 1.549 | |
 
 **Lectura:** los adolescentes post-Great Rewiring tienen **1.55x el odds** de depresión que los pre-Great Rewiring.
@@ -296,7 +298,7 @@ Análisis estratificado por sexo × raza (8 categorías CDC) usando solo años d
 
 ## 5.7 Depresión y mortalidad no se correlacionan
 
-Para 2019-2021, la correlación entre sad/hopeless (YRBS) y mortalidad 15-19 (NCHS) es **r = -0.07, p = 0.94** (n = 4 observaciones, sin poder).
+Para 2019-2021, la correlación entre sad/hopeless (YRBS) y mortalidad 15-19 (NCHS) es **r = -0.95, p = 0.049** con solo n = 4 observaciones (2 años × 2 sexos). El p-valor es difícil de interpretar con tan pocos puntos, pero la **dirección cualitativa** es informativa:
 
 Cualitativamente:
 
@@ -386,15 +388,15 @@ ROI estimado: 3-5x en costos evitados de salud mental [-@lee2022roi].
 
 ## 8.1 Conclusiones
 
-1. **El deterioro de salud mental adolescente en EE.UU. (2005-2021) es real, monotónico, y estadísticamente significativo.** La regresión logística confirma un OR de 1.93 entre 2005 y 2021.
+1. **El deterioro de salud mental adolescente en EE.UU. (2005-2021) es real y estadísticamente significativo.** La regresión logística confirma un OR de 1.93 entre 2005 y 2021.
 
-2. **La transición a infancia phone-based (2010-2015) coincide con un cambio de régimen** tanto en la depresión autopercibida (+9.5pp post vs pre) como en la mortalidad por suicidio (+60% en 15-19 entre 2010-2018).
+2. **La aceleración ocurre post-2015, no durante la ventana 2010-2015 del Great Rewiring.** Los datos muestran una subida modesta en 2010-2015 (+3.8pp en 6 años, de 26.1% a 29.9%) y la aceleración real es 2017→2021 (+10.8pp en 4 años, de 31.5% a 42.3%). La mortalidad por suicidio (15-19) pasó de 7.5/100k (2010) a 12.0/100k (2018), un **+60%** que **sucede después** de la ventana rewiring. Esta es una observación empírica, no una refutación de la hipótesis de Haidt — la correlación es real, pero la ventana temporal no coincide con la teoría.
 
 3. **El gap de género se amplió 71%** (16.4pp → 28.0pp), con mujeres pasando de 36.7% a 56.6% sad/hopeless.
 
-4. **La dosis-respuesta screen time es monotónica y robusta** (OR 2.14 para 5+h/día, 2019).
+4. **La dosis-respuesta screen time tiene forma de J, no monotónica.** OR ajustada para 1h es 0.95 (menor que no-uso); la aceleración ocurre a partir de 3h. Los 5+h tienen OR 2.14 (IC95 1.90-2.41) en 2019. Caveat: transversal, e IC95 no corrigen por el diseño complejo.
 
-5. **La mortalidad completed no captura la carga de salud mental**, especialmente en mujeres. Necesitamos indicadores precoces.
+5. **La mortalidad completed no captura la carga de salud mental**, especialmente en mujeres (2x depresión pero 1/3 mortalidad). Necesitamos indicadores precoces.
 
 6. **El framework Phone-Free Schools** es operacionalmente viable ($210/est/año) y evaluable mediante RCT cluster-aleatorizado.
 
@@ -408,8 +410,13 @@ ROI estimado: 3-5x en costos evitados de salud mental [-@lee2022roi].
 
 ### De datos
 - **Bug en cleaning 1.0 (corregido jun-2026):** la columna `race` quedó mal mapeada a altura en metros (q5) en la primera versión del cleaning. **Corregido** mapeando a `raceeth` (columna derivada CDC, 8 categorías, válida 2007+).
+- **Bug en cleaning 1.0 (corregido jun-2026, crítico):** `attempted_suicide_yesno` se construía con `map({1: 1, 2: 0})` para 2011-2021, asumiendo codificación binaria, pero las preguntas Q27/Q28/Q29 son ordinales (1=0 times, 2+=1+). La variable estaba **invertida** para 8 de 9 años. **Corregido** con mapeo `(q >= 2)` para 2009-2021. Validado contra CDC YRBS oficial: 2019 = 8.9%, 2021 = 10.2%. **Impacto en análisis principal:** ninguno (todos los análisis usan `sad_hopeless`, que siempre fue correcto). Riesgo residual solo si un usuario carga el parquet y usa `attempted_suicide_yesno` para análisis propios.
 - **Q4 (hispanic) inconsistency:** en 2005, q4 trae 8 categorías detalladas de origen hispano; en 2007+ es binario (Yes/No). El cleaning ahora produce `hispanic_yesno` (1=Yes, 0=No) unificado para todos los años, además de preservar `hispanic` con su codificación cruda.
 - **Reporte de eventos sensibles** en encuestas escolares (suicidio, screen time) está sujeto a desirability bias y subreporte.
+
+### Metodológicas adicionales (jun-2026)
+- **Diseño muestral complejo no modelado:** las regresiones usan `weight` como `freq_weights` pero ignoran `stratum`+`psu`. Los IC95 de las OR son más estrechos de lo correcto; un análisis riguroso requeriría `cov_type='cluster'` o el módulo `samplics`. Las conclusiones direccionales se mantienen.
+- **Chi-cuadrado pre/post:** ahora se reportan dos versiones: con conteos no ponderados (~580) y con conteos ponderados (919) como referencia. Ambos dan p < 0.001.
 
 ### De generalización
 - **Contexto USA 2010-2021:** no necesariamente extrapolable a otros países con diferente penetración smartphone.

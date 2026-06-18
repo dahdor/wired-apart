@@ -28,9 +28,9 @@
   1. **sad/hopeless** en adolescentes subió de **28.5% (2005) a 42.3% (2021)** = **+48%** en 16 años.
   2. **Mujeres**: 36.7% → **56.6%** = **+54%**. **Hombres**: 20.4% → 28.6% = **+40%**. **Gap de género** creció de 16.4pp a **28.0pp** (amplificación del 71%).
   3. **Regresión logística** (n=131,936): OR de 2021 vs 2005 = **1.93** (IC95 1.84-2.03), controlando por sexo y edad.
-  4. **Screen time 2019 (dosis-respuesta):** OR ajustados de 0.95 (1h), 1.14 (2h), 1.32 (3h), 1.85 (4h), **2.14 (5+h/día)** vs no-uso.
+  4. **Screen time 2019 (forma de J, no monotónica):** OR ajustados vs no-uso: 1.19 (<1h), 0.95 (1h), 1.14 (2h), 1.32 (3h), 1.85 (4h), **2.14 (5+h/día)**. Riesgo crece fuertemente a partir de 3h/día; uso de 1h tiene OR ligeramente *inferior* al no-uso (ver análisis 4 de `notebooks/3.0-dh-analysis.ipynb`).
   5. **Mortalidad 15-19** (NCHS Data Brief 471, agregado ambos sexos): 7.5/100k (2010) → 12.0/100k (2018) = **+60%**. Pico masculino 17.9/100k (HUS 2018 Table 9) en 2017.
-  6. **Cambio de régimen 2010-2015** coincide con la ventana del Great Rewiring teorizado por Haidt.
+  6. **Aceleración post-2015, no durante el rewiring:** los datos muestran una subida modesta 2010-2015 (+3.8pp en 6 años); el salto real es 2017→2021 (+10.8pp en 4 años). La ventana "rewiring" de Haidt no es un punto de inflexión en la serie.
   7. **Divorcio YRBS-NCHS:** las mujeres tienen 2x la depresión de los hombres pero 1/3 de su mortalidad completed. La mortalidad **no captura** la carga de salud mental femenina.
 - **Propuesta.** Framework *Phone-Free Schools* con 4 palancas operacionales, 5 KPIs SMART con líneas base cuantificadas, y diseño A/B (RCT cluster-aleatorizado, n=3 000, 2 años, USD 210/est/año, ROI estimado 3-5x).
 
@@ -75,7 +75,7 @@ wired-apart/
 │   └── apa.csl                          ← Citation Style Language
 │
 ├── reports/                  ← entregables finales
-│   ├── figures/              ← 14 figuras PNG narradas
+│   ├── figures/              ← 13 figuras PNG narradas (fig1–fig13; fig10 = mortalidad vs depresión)
 │   ├── informe.html          ← 5.7 MB, self-contained
 │   ├── informe.pdf           ← 2.7 MB, 24 páginas
 │   └── logo-unimet.png
@@ -210,18 +210,19 @@ Los outputs se guardan en `reports/informe.html` y `reports/informe.pdf`.
 
 **Lectura:** el gap de género creció de 16.4pp a 28.0pp (×1.7). **Para 2021, más de la mitad (56.6%) de las mujeres adolescentes reportan sad/hopeless 2+ semanas seguidas.** Consistente con la hipótesis de Haidt sobre plataformas *image-based* que afectan desproporcionadamente a mujeres.
 
-### 3. Dosis-respuesta con screen time (2019)
+### 3. Dosis-respuesta con screen time (2019) — **forma de J, no monotónica**
 
-| Screen time (h/día) | OR ajustado (IC95) |
-|---|---|
-| <1h | 1.19 (1.03-1.38) |
-| 1h | 0.95 (0.81-1.10) |
-| 2h | 1.14 (1.00-1.30) |
-| 3h | 1.32 (1.16-1.51) |
-| 4h | 1.85 (1.60-2.13) |
-| **5+h** | **2.14 (1.90-2.41)** |
+| Screen time (h/día) | OR ajustado (IC95) | % sad/hopeless ponderado |
+|---|---|---|
+| 0 (no usa) | 1.00 (referencia) | 33.5% |
+| <1h | 1.19 (1.03-1.38) | 33.0% |
+| **1h** | **0.95 (0.81-1.10)** | **28.1%** |
+| 2h | 1.14 (1.00-1.30) | 31.9% |
+| 3h | 1.32 (1.16-1.51) | 35.2% |
+| 4h | 1.85 (1.60-2.13) | 43.7% |
+| **5+h** | **2.14 (1.90-2.41)** | **47.8%** |
 
-Asociación monotónica, estadísticamente significativa. **Caveat:** transversal, no longitudinal; causalidad inversa posible.
+La curva es **decreciente para 0–1h y luego creciente**, no monotónica. El mínimo de riesgo se observa en 1h/día (OR < 1), y el riesgo se acelera a partir de 3h/día. Esto es consistente con la hipótesis de Haidt (uso problemático encolas en horas altas) pero **invalida una lectura lineal**. **Caveat:** transversal, no longitudinal; causalidad inversa posible.
 
 ### 4. Mortalidad adolescente (NCHS)
 
@@ -282,6 +283,7 @@ Estratificación por sexo × raza (8 categorías CDC, válida 2007+). **No hay i
 6. **Reporte de eventos sensibles** (suicidio, screen time) en encuestas escolares está sujeto a desirability bias y subreporte.
 7. **PHQ-5 autoreportado** puede tener desirability bias post-intervención (los estudiantes saben que el programa usa la encuesta).
 8. **Generalización cultural.** Contexto USA 2010-2021; transferibilidad a otros países no se asume.
+9. **Diseño muestral complejo no modelado (jun-2026).** Las regresiones usan `weight` como `freq_weights` pero **ignoran la estructura de conglomerados** (`stratum`+`psu`). Esto subestima los errores estándar y produce IC95 más estrechos y p-valores más optimistas de lo correcto. Análisis definitivo requeriría `cov_type='cluster'` en `statsmodels` o el módulo `samplics`. **Las conclusiones direccionales se mantienen**, pero la magnitud exacta de los IC95 y p-valores debe interpretarse con cautela.
 
 ---
 
@@ -301,7 +303,7 @@ make pipeline
 Outputs:
 - `data/processed/yrbs_clean_2005_2021.parquet` — 134,674 × 17 (cleaned YRBS).
 - `data/processed/wonder_clean_2005_2024.csv` — 40 × 9 (cleaned NCHS mortalidad).
-- `reports/figures/fig[1-14]_*.png` — 14 figuras narradas.
+- `reports/figures/fig[1-13]_*.png` — 13 figuras narradas (fig10 = mortalidad vs depresión; nota: el README mencionaba "14" por error, ver CHANGELOG.md).
 - `reports/informe.html` (5.7 MB), `reports/informe.pdf` (2.7 MB, 24 p).
 
 ---

@@ -125,6 +125,13 @@ def load_yrbs_clean(path: Path | None = None) -> pd.DataFrame:
 # Este mapeo fue validado empíricamente comparando las distribuciones
 # (% yes) entre años contra los codebooks oficiales.
 # Documentado en notebooks/1.0-dh-yrbs-cleaning.ipynb.
+#
+# ⚠️ NOTA sobre attempted_suicide (jun-2026):
+#   - 2005-2007: Q22 es BINARIO (1=Yes, 2=No)
+#   - 2009-2021: Q26/Q27/Q28/Q29 es ORDINAL (1=0 times=No, 2+=Yes)
+# El cleaning debe distinguir entre estos dos formatos. La rama `if year == 2009`
+# original (antes de jun-2026) generaba attempted_suicide_yesno invertido para
+# 2011-2021. Ver CHANGELOG.md para el detalle.
 YRBS_QCODE_CROSSWALK: dict[int, dict[str, str]] = {
     2005: {
         "sad_hopeless": "q23",

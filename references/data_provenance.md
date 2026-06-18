@@ -107,6 +107,8 @@ miden actividad física, TV, o deportes.
 **License:** Public domain (US Government work)
 **Uso:** extender la serie de mortalidad hacia atrás de 2018 (límite de Socrata) a 2010.
 
+> ⚠️ **Corrección de provenance (jun-2026, CHANGELOG):** el archivo PDF `hus2018_table9.pdf` y los 12 puntos extraídos manualmente **incluyen 2017**, pero la tabla HUS *2018* típicamente contiene datos hasta 2016 (retraso de ~2 años respecto a la fecha de publicación). Los valores 2017 aquí listados (F 15-19 = 5.4, M 15-19 = 17.9) **probablemente provienen de HUS 2019** (publicado en 2019) o de un PDF de la Health, United States anual. **TODO:** verificar contra HUS 2019 / HUS 2020 el origen exacto de los 4 valores 2017 y actualizar este SHA-256. El análisis no cambia mientras los valores numéricos sean correctos.
+
 ## NCHS Data Brief 471 (PDF)
 
 **URL:** https://www.cdc.gov/nchs/data/databriefs/db471.pdf
