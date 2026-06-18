@@ -81,8 +81,9 @@ wired-apart/
 - [uv](https://docs.astral.sh/uv/) (gestor de dependencias y entornos)
 - [Quarto ≥ 1.9](https://quarto.org/docs/get-started/) (para el informe)
 - [TeX](https://quarto.org/docs/output-formats/pdf-basics.html) o [Typst](https://quarto.org/docs/output-formats/pdf-basics.html) (para el PDF)
+- *(Opcional)* [`make`](https://www.gnu.org/software/make/) para los atajos. **No es requerido** — cada target tiene un equivalente directo en `uv run`.
 
-### Pasos
+### Pasos con `make` (recomendado)
 
 ```bash
 # 1. Clonar
@@ -102,12 +103,42 @@ make all           # equivalente a: make pipeline && make report
 make pipeline      # ejecuta los 8 notebooks en orden
 make report        # renderiza el informe a HTML y PDF
 make test          # corre los tests de pytest
+make clean         # borra pyc, __pycache__, .ipynb_checkpoints
 ```
+
+### Pasos sin `make` (equivalentes portables)
+
+`make` no viene preinstalado en Windows ni en macOS. Si no lo tenés, los mismos comandos funcionan directamente con `uv`:
+
+```bash
+# 1. Clonar
+git clone https://github.com/dahdor/wired-apart.git
+cd wired-apart
+
+# 2. Instalar dependencias
+uv sync --all-extras
+
+# 3. Colocar los datos crudos en data/raw/
+
+# 4. Pipeline + informe
+uv run python -m jupyter execute notebooks/0.0-dh-data-acquisition.ipynb
+uv run python -m jupyter execute notebooks/1.0-dh-yrbs-cleaning.ipynb
+# ... (repetir para cada notebook 1.x a 5.0)
+uv run quarto render informe.qmd --to html
+uv run quarto render informe.qmd --to pdf
+```
+
+O usar el script `scripts/run_pipeline.py` que encapsula la secuencia (lo agregamos en la Fase 7 si te parece útil).
 
 ### Solo regenerar el informe
 
 ```bash
+# Con make
 make report
+
+# Sin make
+uv run quarto render informe.qmd --to html
+uv run quarto render informe.qmd --to pdf
 ```
 
 ---
