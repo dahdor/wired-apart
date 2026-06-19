@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1920, initial-scale=1.0" />
+  <title>Wired Apart — El coste de la infancia digital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,500&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="deck" id="deck">
+
+    <!-- ============================================================== -->
+    <!-- SLIDE 1 — PORTADA                                                -->
+    <!-- ============================================================== -->
+    <section class="slide slide--cover" data-slide="1" data-title="Portada">
+      <div class="cover-grid">
+        <figure class="cover-img cover-img--left">
+          <img src="kids2008.jpg" alt="Niños jugando en la calle, 2008" />
+          <figcaption>2008 · Infancia basada en el juego</figcaption>
+        </figure>
+        <figure class="cover-img cover-img--right">
+          <img src="teen2018.png" alt="Adolescente mirando el teléfono, 2018" />
+          <figcaption>2018 · Infancia phone-based</figcaption>
+        </figure>
+
+        <div class="cover-overlay" aria-hidden="true"></div>
+
+        <div class="cover-content">
+          <p class="cover-eyebrow">Proyecto Final · Análisis de Datos</p>
+          <h1 class="cover-title">
+            Wired <span class="cover-title__accent">Apart</span>
+          </h1>
+          <p class="cover-subtitle">El coste de la infancia digital</p>
+
+          <div class="cover-meta">
+            <div class="cover-meta__col">
+              <span class="cover-meta__label">Autoría</span>
+              <span class="cover-meta__value">Diego Hernández</span>
+            </div>
+            <div class="cover-meta__col">
+              <span class="cover-meta__label">Asignatura</span>
+              <span class="cover-meta__value">FPTSP27 · Análisis de Datos</span>
+            </div>
+            <div class="cover-meta__col">
+              <span class="cover-meta__label">Periodo</span>
+              <span class="cover-meta__value">2526-3</span>
+            </div>
+          </div>
+        </div>
+
+        <img class="cover-logo" src="unimet.png" alt="Universidad Metropolitana" />
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- SLIDE 2 — LA EPIDEMIA SILENCIOSA                                 -->
+    <!-- ============================================================== -->
+    <section class="slide slide--content" data-slide="2" data-title="La Epidemia Silenciosa">
+      <header class="slide-header">
+        <div class="slide-header__left">
+          <span class="slide-tag">01 · Contexto</span>
+          <h2 class="slide-title">La Epidemia Silenciosa</h2>
+          <p class="slide-subtitle">Cambio en el tiempo · 2005–2021</p>
+        </div>
+        <div class="slide-header__right">
+          <p class="slide-quote">
+            “El promedio oculta la verdad. Hay que hacer
+            <em>drill&#8209;down</em>.”
+          </p>
+        </div>
+      </header>
+
+      <div class="slide-body two-col">
+        <figure class="chart-frame">
+          <img src="figures/fig1_sad_hopeless_trend.png" alt="Tendencia de depresión autopercibida 2005-2021" />
+        </figure>
+
+        <aside class="side-stack">
+          <div class="stat-card stat-card--hero">
+            <span class="stat-card__eyebrow">sad/hopeless ≥ 2 semanas</span>
+            <div class="stat-card__delta">
+              <span class="stat-card__value">28.5<span class="stat-card__unit">%</span></span>
+              <svg class="stat-card__arrow" viewBox="0 0 40 20" aria-hidden="true">
+                <path d="M2 14 L18 14 M14 10 L18 14 L14 18 M18 14 L38 14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <span class="stat-card__value stat-card__value--alt">42.3<span class="stat-card__unit">%</span></span>
+            </div>
+            <span class="stat-card__delta-pill">+48% en 16 años</span>
+          </div>
+
+          <ul class="bullet-list">
+            <li>
+              <span class="bullet-num">1</span>
+              <span><strong>2 bases públicas de EE. UU.</strong> — CDC YRBS + NCHS WONDER.</span>
+            </li>
+            <li>
+              <span class="bullet-num">2</span>
+              <span><strong>16 años y 134 674 estudiantes</strong> en la cohorte nacional.</span>
+            </li>
+            <li>
+              <span class="bullet-num">3</span>
+              <span><strong>El Gran Recableado (2010–2015)</strong> precede el salto post-2017.</span>
+            </li>
+          </ul>
+        </aside>
+      </div>
+
+      <footer class="slide-footer">
+        <span class="slide-footer__source">Fuente · YRBS National High School Survey, 2005–2021 (n = 134 674, ponderado)</span>
+        <span class="slide-footer__counter">02 / 08</span>
+      </footer>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- SLIDE 3 — LA BRECHA DE GÉNERO                                    -->
+    <!-- ============================================================== -->
+    <section class="slide slide--content" data-slide="3" data-title="La Brecha de Género">
+      <header class="slide-header">
+        <div class="slide-header__left">
+          <span class="slide-tag">02 · Contraste</span>
+          <h2 class="slide-title">La Brecha de Género</h2>
+          <p class="slide-subtitle">El hallazgo más impactante del análisis</p>
+        </div>
+        <div class="slide-header__right">
+          <p class="slide-quote">
+            “La brecha se amplifica un
+            <em class="hl">71%</em>.”
+          </p>
+        </div>
+      </header>
+
+      <div class="slide-body two-col">
+        <figure class="chart-frame">
+          <img src="figures/fig2_sex_gap.png" alt="Tendencia de sad/hopeless por sexo 2005-2021" />
+        </figure>
+
+        <aside class="side-stack">
+          <div class="compare-stack">
+            <div class="compare-row">
+              <span class="compare-row__icon compare-row__icon--male" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="3.2" /><path d="M5 21 L5 14 a7 7 0 0 1 14 0 L19 21 M12 11 L12 21" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" /></svg>
+              </span>
+              <div class="compare-row__body">
+                <span class="compare-row__label">Hombres</span>
+                <span class="compare-row__values">20.4% → <strong>28.6%</strong></span>
+                <span class="compare-row__delta compare-row__delta--mild">+40%</span>
+              </div>
+            </div>
+
+            <div class="compare-row compare-row--featured">
+              <span class="compare-row__icon compare-row__icon--female" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="3.2" /><path d="M5 21 L5 14 a7 7 0 0 1 14 0 L19 21 M12 11 L12 21" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" /></svg>
+              </span>
+              <div class="compare-row__body">
+                <span class="compare-row__label">Mujeres</span>
+                <span class="compare-row__values">36.7% → <strong>56.6%</strong></span>
+                <span class="compare-row__delta compare-row__delta--severe">+54%</span>
+              </div>
+            </div>
+
+            <div class="compare-gap">
+              <span class="compare-gap__label">Brecha (gap)</span>
+              <span class="compare-gap__value">16.4pp → <strong>28.0pp</strong></span>
+            </div>
+          </div>
+
+          <div class="callout">
+            <span class="callout__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3 L13.5 9 L20 9 L14.5 12.5 L16.5 19 L12 15 L7.5 19 L9.5 12.5 L4 9 L10.5 9 Z" fill="currentColor" /></svg>
+            </span>
+            <p>
+              <strong>Hipótesis:</strong> las plataformas basadas en imágenes
+              (Instagram, TikTok) castigan desproporcionadamente a las mujeres
+              mediante comparación social constante.
+            </p>
+          </div>
+        </aside>
+      </div>
+
+      <footer class="slide-footer">
+        <span class="slide-footer__source">Fuente · YRBS 2005–2021, estimaciones ponderadas por sexo</span>
+        <span class="slide-footer__counter">03 / 08</span>
+      </footer>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- SLIDE 4 — LA PARADOJA: DEPRESIÓN vs. MORTALIDAD                  -->
+    <!-- ============================================================== -->
+    <section class="slide slide--content" data-slide="4" data-title="La Paradoja">
+      <header class="slide-header">
+        <div class="slide-header__left">
+          <span class="slide-tag">03 · Intersección</span>
+          <h2 class="slide-title">La Paradoja</h2>
+          <p class="slide-subtitle">Depresión sube · Mortalidad se contiene</p>
+        </div>
+        <div class="slide-header__right">
+          <p class="slide-quote">
+            “La mortalidad es un indicador
+            <em>rezagado</em>.”
+          </p>
+        </div>
+      </header>
+
+      <div class="slide-body two-col">
+        <figure class="chart-frame">
+          <img src="figures/fig9_depression_vs_mortality.png" alt="Depresión y mortalidad por sexo 2019-2021" />
+        </figure>
+
+        <aside class="side-stack">
+          <div class="paradox-card">
+            <span class="paradox-card__label">Mujeres 15–19</span>
+            <div class="paradox-card__row">
+              <div class="paradox-card__col">
+                <span class="paradox-card__num">2x</span>
+                <span class="paradox-card__caption">depresión severa vs. hombres</span>
+              </div>
+              <div class="paradox-card__divider" aria-hidden="true"></div>
+              <div class="paradox-card__col">
+                <span class="paradox-card__num">⅓</span>
+                <span class="paradox-card__caption">mortalidad consumada vs. hombres</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="insight-list">
+            <div class="insight-row">
+              <span class="insight-row__num">01</span>
+              <p>Las mujeres reportan <strong>el doble</strong> de depresión severa, pero la mortalidad por suicidio consumado es <strong>un tercio</strong> de la masculina.</p>
+            </div>
+            <div class="insight-row">
+              <span class="insight-row__num">02</span>
+              <p>Si los directivos solo miran las muertes, estamos <strong>ciegos</strong> al sufrimiento diario de millones de adolescentes.</p>
+            </div>
+            <div class="insight-row">
+              <span class="insight-row__num">03</span>
+              <p>Necesitamos <strong>indicadores tempranos</strong>: la depresión auto-reportada es nuestra mejor señal.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <footer class="slide-footer">
+        <span class="slide-footer__source">Fuente · YRBS + NCHS WONDER (Socrata), grupo 15–19 años</span>
+        <span class="slide-footer__counter">04 / 08</span>
+      </footer>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- SLIDE 5 — LA CURVA EN J                                          -->
+    <!-- ============================================================== -->
+    <section class="slide slide--content" data-slide="5" data-title="La Curva en J">
+      <header class="slide-header">
+        <div class="slide-header__left">
+          <span class="slide-tag">04 · Causa raíz</span>
+          <h2 class="slide-title">La Curva en “J”</h2>
+          <p class="slide-subtitle">La dosis importa · horas de pantalla vs. riesgo</p>
+        </div>
+        <div class="slide-header__right">
+          <p class="slide-quote">
+            “No se trata de satanizar la pantalla,
+            se trata de entender la <em>dosis</em>.”
+          </p>
+        </div>
+      </header>
+
+      <div class="slide-body two-col">
+        <figure class="chart-frame">
+          <img src="figures/fig5_screen_sad_2019.png" alt="Sad/hopeless por horas de pantalla 2019" />
+        </figure>
+
+        <aside class="side-stack">
+          <div class="dose-card">
+            <div class="dose-card__row dose-card__row--safe">
+              <span class="dose-card__hours">1 h<span class="dose-card__sub">/día</span></span>
+              <span class="dose-card__or">OR 0.95</span>
+              <span class="dose-card__label">Punto mínimo</span>
+            </div>
+            <div class="dose-card__row dose-card__row--warn">
+              <span class="dose-card__hours">3 h<span class="dose-card__sub">/día</span></span>
+              <span class="dose-card__or">OR 1.32</span>
+              <span class="dose-card__label">Inicio del riesgo</span>
+            </div>
+            <div class="dose-card__row dose-card__row--danger">
+              <span class="dose-card__hours">5+ h<span class="dose-card__sub">/día</span></span>
+              <span class="dose-card__or">OR 2.14</span>
+              <span class="dose-card__label">Riesgo duplicado</span>
+            </div>
+          </div>
+
+          <div class="callout callout--accent">
+            <span class="callout__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 20 L10 14 L13 17 L20 8 M20 8 L20 14 M20 8 L14 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </span>
+            <p>
+              La relación <strong>no es monotónica</strong>. Una hora al día
+              tiene un riesgo <em>ligeramente inferior</em> al no-uso.
+              El salto real ocurre <strong>a partir de 3 h/día</strong>.
+            </p>
+          </div>
+        </aside>
+      </div>
+
+      <footer class="slide-footer">
+        <span class="slide-footer__source">Fuente · YRBS 2019 (Q80 incluye social media), OR ajustados por sexo y edad</span>
+        <span class="slide-footer__counter">05 / 08</span>
+      </footer>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- SLIDE 6 — RIGOR METODOLÓGICO                                     -->
+    <!-- ============================================================== -->
+    <section class="slide slide--content" data-slide="6" data-title="Rigor Metodológico">
+      <header class="slide-header">
+        <div class="slide-header__left">
+          <span class="slide-tag">05 · Rigor</span>
+          <h2 class="slide-title">Rigor Metodológico</h2>
+          <p class="slide-subtitle">Por qué podemos confiar en estos datos</p>
+        </div>
+        <div class="slide-header__right">
+          <p class="slide-quote">
+            “Si no es confiable,
+            <em>no sirve</em>.”
+          </p>
+        </div>
+      </header>
+
+      <div class="slide-body two-col">
+        <div class="rigor-grid">
+          <div class="rigor-card">
+            <span class="rigor-card__num">01</span>
+            <h3 class="rigor-card__title">Diseño complejo del CDC</h3>
+            <p>
+              Encuesta estratificada por colegio con
+              <strong>n = 134 674</strong> estudiantes entre 2005 y 2021.
+              No es una muestra simple.
+            </p>
+          </div>
+
+          <div class="rigor-card">
+            <span class="rigor-card__num">02</span>
+            <h3 class="rigor-card__title">Pesos + Cluster-Robust SE</h3>
+            <p>
+              Regresiones logísticas <strong>ponderadas</strong> con
+              errores estándar <em>cluster-robust</em> a nivel de colegio.
+              Corrige el efecto de diseño.
+            </p>
+          </div>
+
+          <div class="rigor-card rigor-card--featured">
+            <span class="rigor-card__num">03</span>
+            <h3 class="rigor-card__title">Paradoja de Simpson</h3>
+            <p>
+              Validamos el patrón estratificando por
+              <strong>sexo × raza</strong>. La brecha de género
+              es <em>universal y estadísticamente blindada</em>.
+            </p>
+          </div>
+        </div>
+
+        <figure class="chart-frame chart-frame--inset">
+          <img src="figures/fig10_forest_or.png" alt="Forest plots de regresión logística" />
+        </figure>
+      </div>
+
+      <footer class="slide-footer">
+        <span class="slide-footer__source">Fuente · Regresión logística ponderada, YRBS 2005–2021</span>
+        <span class="slide-footer__counter">06 / 08</span>
+      </footer>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- SLIDE 7 — PHONE-FREE SCHOOLS                                     -->
+    <!-- ============================================================== -->
+    <section class="slide slide--content" data-slide="7" data-title="Phone-Free Schools">
+      <header class="slide-header">
+        <div class="slide-header__left">
+          <span class="slide-tag">06 · Solución</span>
+          <h2 class="slide-title">Phone-Free Schools</h2>
+          <p class="slide-subtitle">Framework de ingeniería social · 4 palancas operacionales</p>
+        </div>
+        <div class="slide-header__right">
+          <p class="slide-quote">
+            “Escalable. Medible.
+            <em>Basada en datos</em>.”
+          </p>
+        </div>
+      </header>
+
+      <div class="slide-body solution-body">
+        <div class="levers-grid">
+          <article class="lever">
+            <span class="lever__num">1</span>
+            <h3 class="lever__title">Recoger</h3>
+            <p class="lever__desc">
+              <strong>Lockers magnéticos</strong> al entrar al colegio.
+              Reducir la <em>exposición</em> durante la jornada escolar.
+            </p>
+          </article>
+
+          <article class="lever">
+            <span class="lever__num">2</span>
+            <h3 class="lever__title">Reemplazar</h3>
+            <p class="lever__desc">
+              <strong>Recreo estructurado</strong> y actividades presenciales.
+              Llenar el <em>vacío de atención</em> que llena el teléfono.
+            </p>
+          </article>
+
+          <article class="lever">
+            <span class="lever__num">3</span>
+            <h3 class="lever__title">Monitorear</h3>
+            <p class="lever__desc">
+              <strong>Encuestas semestrales</strong> de bienestar validadas
+              (PHQ-A). Detección temprana.
+            </p>
+          </article>
+
+          <article class="lever">
+            <span class="lever__num">4</span>
+            <h3 class="lever__title">Capacitar</h3>
+            <p class="lever__desc">
+              <strong>Talleres para profesores</strong> en detección de
+              señales y derivación a salud mental.
+            </p>
+          </article>
+        </div>
+
+        <aside class="kpi-strip">
+          <div class="kpi">
+            <span class="kpi__label">Costo</span>
+            <span class="kpi__value">USD 210</span>
+            <span class="kpi__sub">por estudiante / año</span>
+          </div>
+          <div class="kpi kpi--accent">
+            <span class="kpi__label">ROI estimado</span>
+            <span class="kpi__value">3–5x</span>
+            <span class="kpi__sub">retorno social</span>
+          </div>
+          <div class="kpi">
+            <span class="kpi__label">Diseño</span>
+            <span class="kpi__value">RCT</span>
+            <span class="kpi__sub">cluster-aleatorizado, n = 3 000</span>
+          </div>
+          <div class="kpi kpi--accent">
+            <span class="kpi__label">KPI SMART</span>
+            <span class="kpi__value">33%</span>
+            <span class="kpi__sub">tristeza global en 2 años</span>
+          </div>
+        </aside>
+      </div>
+
+      <footer class="slide-footer">
+        <span class="slide-footer__source">Propuesta basada en evidencia YRBS · Validación vía ensayo controlado aleatorizado</span>
+        <span class="slide-footer__counter">07 / 08</span>
+      </footer>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- SLIDE 8 — CONCLUSIÓN Y LLAMADO A LA ACCIÓN                       -->
+    <!-- ============================================================== -->
+    <section class="slide slide--closing" data-slide="8" data-title="Llamado a la Acción">
+      <div class="closing-grid">
+        <div class="closing-content">
+          <span class="slide-tag slide-tag--light">07 · Cierre</span>
+          <h2 class="closing-title">
+            La data es el mapa.<br />
+            <span class="closing-title__alt">La decisión es nuestra.</span>
+          </h2>
+
+          <div class="takeaway-row">
+            <div class="takeaway">
+              <span class="takeaway__num">01</span>
+              <h3>Diagnóstico</h3>
+              <p>1 de cada 2 adolescentes reporta tristeza persistente.</p>
+            </div>
+            <div class="takeaway">
+              <span class="takeaway__num">02</span>
+              <h3>Dosis</h3>
+              <p>Más de 3 h/día de pantalla duplica el riesgo.</p>
+            </div>
+            <div class="takeaway">
+              <span class="takeaway__num">03</span>
+              <h3>Solución</h3>
+              <p>Phone-Free Schools + RCT: medible, escalable, ético.</p>
+            </div>
+          </div>
+
+          <div class="closing-cta">
+            <p class="closing-cta__text">Muchas gracias. Quedo a su entera disposición para preguntas.</p>
+            <div class="closing-cta__sig">
+              <span>Diego Hernández</span>
+              <span class="closing-cta__sub">Universidad Metropolitana · 2526-3</span>
+            </div>
+          </div>
+        </div>
+
+        <img class="closing-logo" src="unimet.png" alt="Universidad Metropolitana" />
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Navegación con teclado + contador en pantalla -->
+  <nav class="hud" aria-label="Controles de presentación">
+    <button class="hud__btn" id="prev" type="button" aria-label="Slide anterior">
+      <svg viewBox="0 0 24 24"><path d="M15 5 L8 12 L15 19" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </button>
+    <span class="hud__counter"><span id="current">1</span> / 8</span>
+    <button class="hud__btn" id="next" type="button" aria-label="Siguiente slide">
+      <svg viewBox="0 0 24 24"><path d="M9 5 L16 12 L9 19" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </button>
+    <button class="hud__btn hud__btn--print" id="print" type="button" aria-label="Exportar a PDF" title="Exportar a PDF">
+      <svg viewBox="0 0 24 24"><path d="M6 9 L6 4 L18 4 L18 9 M6 18 L6 21 L18 21 L18 18 M6 14 L18 14 M9 14 L9 18 L15 18 L15 14" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    </button>
+  </nav>
+
+  <script>
+    // Navegación entre slides
+    (function () {
+      const slides = document.querySelectorAll('.slide');
+      const total = slides.length;
+      let current = 0;
+
+      function go(i) {
+        current = Math.max(0, Math.min(total - 1, i));
+        slides[current].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('current').textContent = current + 1;
+      }
+
+      document.getElementById('prev').addEventListener('click', () => go(current - 1));
+      document.getElementById('next').addEventListener('click', () => go(current + 1));
+      document.getElementById('print').addEventListener('click', () => window.print());
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(current + 1); }
+        if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(current - 1); }
+        if (e.key === 'Home') { e.preventDefault(); go(0); }
+        if (e.key === 'End') { e.preventDefault(); go(total - 1); }
+      });
+    })();
+  </script>
+</body>
+</html>
