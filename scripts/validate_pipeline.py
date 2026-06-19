@@ -28,7 +28,6 @@ from __future__ import annotations
 import argparse
 import os
 from pathlib import Path
-import platform
 import shutil
 import subprocess
 import sys
@@ -43,24 +42,56 @@ from wired_apart import config, force_utf8_stdout
 # wired_apart.force_utf8_stdout para detalles.
 force_utf8_stdout()
 
-# El notebook 0.0 usa pyodbc + Microsoft Access Driver, que solo está
-# disponible en Windows. En Linux/macOS, los .mdb no se pueden convertir,
-# pero `data/processed/yrbs_2005_2021.parquet` ya viene commiteado al repo
-# (es la salida del notebook 0.0) y los notebooks 1.0-5.0 funcionan
-# sin ODBC.
-SKIP_NOTEBOOKS_ON_LINUX = {"0.0-dh-data-acquisition.ipynb"}
+# Notebooks que se saltan si su output ya está en disco. Esto desacopla
+# el pipeline del driver ODBC de Microsoft Access, que NO está
+# preinstalado en los GitHub Actions runners (ni Linux ni Windows).
+# Cuando `data/processed/yrbs_2005_2021.parquet` ya existe, el notebook
+# 0.0 (que convierte .mdb → parquet) se vuelve innecesario y lo
+# salteamos limpiamente. Para forzar la re-adquisición desde .mdb,
+# basta con borrar ese parquet antes de correr el validate.
+SKIP_NOTEBOOKS_IF_OUTPUT_EXISTS: dict[str, Path] = {
+    "0.0-dh-data-acquisition.ipynb": config.PROCESSED_DIR / "yrbs_2005_2021.parquet",
+}
 
 
-def _py() -> str:
-    """Devuelve el ejecutable de Python que debe usarse para subprocesos.
+def _has_uv() -> bool:
+    """True si `uv` está disponible en PATH.
 
-    Si `uv` está disponible, prefiere `uv run python` (usa el .venv del
-    proyecto, donde están las dependencias). Si no, cae al Python que
-    ejecuta este script.
+    El check se hace en cada llamada (no cacheado) porque subprocess
+    hereda un PATH que puede no incluir el cargo bin donde se instala
+    `uv` en GitHub Actions. Es decir, `shutil.which("uv")` puede dar
+    True en el padre pero False en el hijo.
     """
-    if shutil.which("uv"):
-        return "uv"
-    return sys.executable
+    return shutil.which("uv") is not None
+
+
+def _run_script(script_path: str) -> list[str]:
+    """Comando para ejecutar un script Python (.py) como subproceso.
+
+    A diferencia de `_run_module`, esto NO usa `-m` porque un path a
+    un .py no es un module name válido. Funciona cross-platform::
+
+        _run_script("scripts/download_data.py")
+        → ["uv", "run", "scripts/download_data.py"]   si uv está
+        → ["<python>", "scripts/download_data.py"]     si no
+    """
+    if _has_uv():
+        return ["uv", "run", script_path]
+    return [sys.executable, script_path]
+
+
+def _run_module(*module_args: str) -> list[str]:
+    """Comando para ejecutar un módulo Python como subproceso.
+
+    Usa `-m` para que Python localice el módulo correctamente::
+
+        _run_module("pytest", "tests/", "-v")
+        → ["uv", "run", "pytest", "tests/", "-v"]      si uv está
+        → ["<python>", "-m", "pytest", "tests/", "-v"] si no
+    """
+    if _has_uv():
+        return ["uv", "run", *module_args]
+    return [sys.executable, "-m", *module_args]
 
 
 # Orden de preferencia de motores LaTeX. Quarto los auto-detecta; nosotros
@@ -158,11 +189,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.quick:
         print("=== Modo quick: solo tests + outputs ===")
-        py = _py()
-        if py == "uv":
-            ok = step("pytest", ["uv", "run", "pytest", "tests/", "-v"])
-        else:
-            ok = step("pytest", [py, "-m", "pytest", "tests/", "-v"])
+        ok = step("pytest", _run_module("pytest", "tests/", "-v"))
         if not ok:
             return 1
         issues = check_outputs()
@@ -176,14 +203,14 @@ def main(argv: list[str] | None = None) -> int:
 
     # Pipeline completo
     steps_ok: list[bool] = []
-    py = _py()
-    py_prefix = ["uv", "run"] if py == "uv" else [py, "-m"]
 
     if not args.skip_download:
-        steps_ok.append(step("download_data", py_prefix + ["scripts/download_data.py"]))
-    steps_ok.append(step("pytest (validación inicial)", py_prefix + ["pytest", "tests/", "-v"]))
-    # Notebooks en orden, saltando los platform-specific en Linux.
-    is_windows = platform.system() == "Windows"
+        steps_ok.append(step("download_data", _run_script("scripts/download_data.py")))
+    steps_ok.append(step("pytest (validación inicial)", _run_module("pytest", "tests/", "-v")))
+    # Notebooks en orden, saltando los que tienen output commiteado
+    # (ver SKIP_NOTEBOOKS_IF_OUTPUT_EXISTS). Esto desacopla el pipeline
+    # del driver ODBC de Microsoft Access, que no está en los runners
+    # de GitHub Actions (ni Linux ni Windows).
     notebooks = [
         ("0.0", "notebooks/0.0-dh-data-acquisition.ipynb"),
         ("1.0", "notebooks/1.0-dh-yrbs-cleaning.ipynb"),
@@ -196,20 +223,28 @@ def main(argv: list[str] | None = None) -> int:
     ]
     for label, path in notebooks:
         nb_name = Path(path).name
-        if not is_windows and nb_name in SKIP_NOTEBOOKS_ON_LINUX:
-            print(f"\n=== Saltando notebook {label} ({nb_name}) en {platform.system()} ===")
-            print("  Razón: requiere Microsoft Access ODBC driver (Windows-only).")
-            print("  El output (data/processed/yrbs_2005_2021.parquet) ya está commiteado.")
+        skip_output = SKIP_NOTEBOOKS_IF_OUTPUT_EXISTS.get(nb_name)
+        if skip_output is not None and skip_output.exists():
+            print(f"\n=== Saltando notebook {label} ({nb_name}) ===")
+            print(f"  Output ya existe: {skip_output.relative_to(PROJECT_ROOT)}")
+            print("  Para forzar la re-adquisición, borrá el output antes de correr.")
             continue
         steps_ok.append(
             step(
                 f"notebook {label} ({Path(path).stem})",
-                py_prefix
-                + ["jupyter", "nbconvert", "--to", "notebook", "--execute", "--inplace", path],
+                _run_module(
+                    "jupyter",
+                    "nbconvert",
+                    "--to",
+                    "notebook",
+                    "--execute",
+                    "--inplace",
+                    path,
+                ),
             )
         )
     # Re-correr tests después del pipeline (detecta drift)
-    steps_ok.append(step("pytest (post-pipeline)", py_prefix + ["pytest", "tests/", "-v"]))
+    steps_ok.append(step("pytest (post-pipeline)", _run_module("pytest", "tests/", "-v")))
     if not args.skip_render:
         # Asegurar que quarto está en el PATH; sin esto, subprocess.call()
         # no lo encuentra aunque esté en ~/.local/quarto/bin.
